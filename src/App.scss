@@ -1,0 +1,137 @@
+$dark: #282C34;
+$light: #D3D3D3;  // lightgray
+$medium: #696969;  // dimgray
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-items: stretch;
+  height: 100vh;
+
+  & header {
+    flex: 0 0 auto;
+    background-color: $dark;
+    display: flex;
+    justify-content: space-between;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    padding: 32px;
+
+
+    & a {
+      text-decoration: none;
+      color: white;
+    }
+
+    & button {
+      color: white;
+      background-color: transparent;
+      border: none;
+      font-size: .75em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    & h1 {
+      text-transform: uppercase;
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    & nav ol {
+      margin: 0;
+      list-style-type: none;
+
+      & li {
+        display: inline;
+        padding: 0 16px;
+      }
+    }
+  }
+
+  & h2 {
+    text-transform: uppercase;
+  }
+
+  & > div {
+    flex: 1 0 auto;
+
+    &.overview {
+      display: flex;
+      justify-content: space-around;
+      padding: 32px;
+      align-items: flex-start;
+
+      & > div {
+        flex: 0 0 20%;
+        border: 1px solid $dark;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      & > div h2 {
+        flex: 0 0 auto;
+        margin: 0;
+      }
+
+      & > div ul {
+        list-style-type: none;
+        padding: 0;
+        align-self: stretch;
+      }
+    }
+
+    &.two-panel {
+      display: flex;
+      align-items: stretch;
+
+      & > div.tabs-panel {
+        padding: 0;
+        margin: 0;
+        flex: 0 0 35%;
+        border-right: 1px solid $dark;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+
+        & .tabs-container {
+          display: flex;
+
+          & > .tab {
+            flex: 1 1 auto;
+            border: 1px solid white;
+            background-color: $light;
+            cursor: pointer;
+            flex-wrap: wrap;
+            padding: 8px 16px;
+            //min-width: 100px;
+
+            &.current {
+              pointer-events: none;
+              background-color: $medium;
+              color: white;
+            }
+          }
+        }
+
+        & > .tab-content {
+          flex: 1 0 auto;
+        }
+      }
+
+      & > div.main-panel {
+        flex: 1 0 auto;
+      }
+
+      .factory {
+        width: 300px;
+        height: 300px;
+        border: 1px solid blue;
+        background: transparent;
+      }
+    }
+  }
+}

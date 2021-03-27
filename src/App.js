@@ -1,25 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import {createContext, useState} from 'react';
+import Overview from './components/overview/Overview';
+import Factory from './components/factory/Factory';
+import Kennel from './components/kennel/Kennel';
+import {GameWrapper} from './components/GameWrapper';
+import Header from './components/Header';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const views = {
+	overview: 'OVERVIEW',
+	factory: 'FACTORY',
+	kennel: 'KENNEL'
+};
+
+export const ViewContext = createContext();
+
+function App () {
+	const [currentView, setCurrentView] = useState(views.overview);
+
+	let viewContent;
+
+	if (currentView === views.factory) {
+		viewContent = <Factory/>;
+	}
+	else if (currentView === views.kennel) {
+		viewContent = <Kennel/>;
+	}
+	else {  // views.overview
+		viewContent = <Overview/>;
+	}
+
+	return (
+		<ViewContext.Provider value={{
+			showOverview: () => setCurrentView(views.overview),
+			showFactory: () => setCurrentView(views.factory),
+			showKennel: () => setCurrentView(views.kennel),
+			isCurrentViewOverview: () => currentView === views.overview,
+			isCurrentViewFactory: () => currentView === views.factory,
+			isCurrentViewKennel: () => currentView === views.kennel
+		}}>
+			<GameWrapper>
+				<div className="dashboard">
+					<Header/>
+					{viewContent}
+				</div>
+			</GameWrapper>
+		</ViewContext.Provider>
+	);
+
 }
 
 export default App;
