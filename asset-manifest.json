@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/robot-pet-factory/static/css/main.3e016554.chunk.css",
+    "main.js": "/robot-pet-factory/static/js/main.86b79b05.chunk.js",
+    "main.js.map": "/robot-pet-factory/static/js/main.86b79b05.chunk.js.map",
+    "runtime-main.js": "/robot-pet-factory/static/js/runtime-main.36499b4e.js",
+    "runtime-main.js.map": "/robot-pet-factory/static/js/runtime-main.36499b4e.js.map",
+    "static/js/2.76ac4bea.chunk.js": "/robot-pet-factory/static/js/2.76ac4bea.chunk.js",
+    "static/js/2.76ac4bea.chunk.js.map": "/robot-pet-factory/static/js/2.76ac4bea.chunk.js.map",
+    "static/js/3.96fce5d9.chunk.js": "/robot-pet-factory/static/js/3.96fce5d9.chunk.js",
+    "static/js/3.96fce5d9.chunk.js.map": "/robot-pet-factory/static/js/3.96fce5d9.chunk.js.map",
+    "index.html": "/robot-pet-factory/index.html",
+    "static/css/main.3e016554.chunk.css.map": "/robot-pet-factory/static/css/main.3e016554.chunk.css.map",
+    "static/js/2.76ac4bea.chunk.js.LICENSE.txt": "/robot-pet-factory/static/js/2.76ac4bea.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.36499b4e.js",
+    "static/js/2.76ac4bea.chunk.js",
+    "static/css/main.3e016554.chunk.css",
+    "static/js/main.86b79b05.chunk.js"
+  ]
+}
