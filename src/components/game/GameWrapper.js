@@ -1,7 +1,7 @@
 import {createContext, useReducer} from 'react';
 import {getWorkerById, loadWorkers, unlockableWorkers, updateIntervals} from './workers';
 import {
-	findUpgradeById,
+	findUpgradeById, formatUpgradesForDisplay,
 	getAvailableUpgradesForDisplay, getFactoryDefault,
 	getSingleClickIncrement
 } from '../../services/upgrades/service';
@@ -137,6 +137,7 @@ function GameWrapper ({children}) {
 					// updateIntervals(state, handleAutoIncrement(dispatch));
 				},
 				getAvailableUpgrades: () => getAvailableUpgradesForDisplay(state),
+				getAcquiredUpgrades: () => formatUpgradesForDisplay(state),
 				getAvailableWorkers,
 				// canSeeWorkers: canSeeWorkers(state)
 				canSeeWorkers: false

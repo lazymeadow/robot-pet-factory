@@ -11,7 +11,6 @@ export default function Factory () {
 				const availableWorkers = getAvailableWorkers('factory');
 				return (
 					<>
-						<h2>Factory</h2>
 						<Tabs defaultTabKey={'upgrades'}>
 							<TabsContainer>
 								<Tab tabKey={'upgrades'}>Upgrades</Tab>
@@ -103,21 +102,24 @@ export default function Factory () {
 
 	const renderMain = () => (
 		<GameContext.Consumer>
-			{({addCoins, recordClick, upgrades}) => (
-				<>
-					<button className={'factory'} onClick={() => {
-						recordClick();
-						addCoins();
-					}}>
-						<img src={''} alt={'the factory - click to make parts'}/>
-					</button>
-					<div>
-						<ol>
-							{/*{upgrades.map(upgrade => <li key={upgrade.id}>{upgrade.name}</li>)}*/}
-						</ol>
-					</div>
-				</>
-			)}
+			{({addCoins, recordClick, getAcquiredUpgrades}) => {
+				const upgrades = getAcquiredUpgrades();
+				return (
+					<>
+						<button id={'factory'} onClick={() => {
+							recordClick();
+							addCoins();
+						}}>
+							<img src={''} alt={'the factory - click to make parts'}/>
+						</button>
+						<div>
+							<ol>
+								{upgrades.map(upgrade => <li key={upgrade.id}>{upgrade.name}</li>)}
+							</ol>
+						</div>
+					</>
+				);
+			}}
 		</GameContext.Consumer>
 	);
 

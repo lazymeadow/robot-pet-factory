@@ -38,6 +38,7 @@ h1, h2, h3, h4, h5, h6, nav {
     align-items: center;
     color: white;
     padding: 32px;
+    height: 40px;
 
     & a {
       text-decoration: none;
@@ -81,6 +82,7 @@ h1, h2, h3, h4, h5, h6, nav {
 
   & > div {
     flex: 1 0 auto;
+    height: calc(100% - 104px);
 
     &.overview {
       display: flex;
@@ -128,6 +130,7 @@ h1, h2, h3, h4, h5, h6, nav {
 
         & .tabs-container {
           display: flex;
+          height: 42px;
 
           & > .tab {
             flex: 1 1 auto;
@@ -146,8 +149,9 @@ h1, h2, h3, h4, h5, h6, nav {
         }
 
         & > .tab-content {
-          flex: 1 0 auto;
           padding: 16px;
+          height: calc(100% - 42px);
+          overflow-y: auto;
 
           & .upgrade {
             margin-bottom: 8px;
@@ -194,14 +198,17 @@ h1, h2, h3, h4, h5, h6, nav {
           border-top: 1px solid $dark;
           margin-top: 16px;
           padding: 16px;
+          height: calc(100% - 350px);
+          overflow-y: scroll;
         }
       }
 
-      .factory {
-        width: 400px;
-        height: 400px;
+      & #factory {
+        width: 350px;
+        height: 350px;
         border: 1px solid blue;
         background: whitesmoke;
+        //flex: 0 0 auto;
       }
     }
   }

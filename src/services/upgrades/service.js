@@ -38,6 +38,34 @@ export const findUpgradeById = (id) => {
 	}
 };
 
+export const getUpgradeForDisplayById = (id) => {
+	for (const [partType, {unlock, quantity, quality}] of Object.entries(factoryPartUpgrades)) {
+		if (unlock.id === id) {
+			return {
+				name: getBaseName(partType),
+				description: getBaseDesc(partType, unlock.incrementer),
+				cost: unlock.cost
+			};
+		}
+		const foundInQuantity = quantity.find(upgrade => upgrade.id === id);
+		if (foundInQuantity) {
+			return {
+				name: getQuantityName(partType, foundInQuantity.level),
+				description: getQuantityDesc(partType, foundInQuantity.incrementer, foundInQuantity.level),
+				cost: unlock.cost
+			};
+		}
+		const foundInQuality = quality.find(upgrade => upgrade.id === id);
+		if (foundInQuality) {
+			return {
+				name: getQualityName(partType, foundInQuality.level),
+				description: getQualityDesc(partType, foundInQuality.multiplier, foundInQuality.incrementer, foundInQuality.level),
+				cost: unlock.cost
+			};
+		}
+	}
+}
+
 export const getSingleClickIncrement = (gameState) => {
 	const mathsMap = {};  // each type will be under its key. accumulate, then do the math individually to get a total
 	gameState.upgrades.forEach(upgradeId => {
@@ -142,5 +170,9 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 
 	return upgradesToReturn;
 };
+
+export const formatUpgradesForDisplay = ({upgrades: upgradeIdsToFormat}) => {
+	return upgradeIdsToFormat.map(getUpgradeForDisplayById);
+}
 
 export const getFactoryDefault = () => getDefaultFactoryUpgrades();

@@ -1,4 +1,4 @@
-import {canSeeWorkers} from './upgrades';
+// import {canSeeWorkers} from './upgrades';
 
 
 const intervalIds = [];
@@ -40,7 +40,7 @@ class Worker {
 		this.addWorker = () => this.count++;
 	}
 
-	isVisible = (state) => canSeeWorkers(state);
+	// isVisible = (state) => canSeeWorkers(state);
 }
 
 const worker1 = new Worker(
