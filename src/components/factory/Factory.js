@@ -7,7 +7,7 @@ import {GameContext} from '../GameWrapper';
 export default function Factory () {
 	const renderTabs = () => (
 		<GameContext.Consumer>
-			{({totalCoins}) => (
+			{({totalClicks, totalCoins}) => (
 				<>
 					<h2>Factory</h2>
 					<Tabs>
@@ -20,7 +20,8 @@ export default function Factory () {
 						<TabContent tabKey={1}>
 							Stats go here
 							<ul>
-								<li>Click Count: {totalCoins}</li>
+								<li>Click Count: {totalClicks}</li>
+								<li>Total Coins: {totalCoins}</li>
 							</ul>
 						</TabContent>
 						<TabContent tabKey={2}>Achivements go here</TabContent>
@@ -32,10 +33,13 @@ export default function Factory () {
 
 	const renderMain = () => (
 		<GameContext.Consumer>
-			{({addCoins}) => (
+			{({addCoins, recordClick}) => (
 				<>
 					<h2>Here we go</h2>
-					<button className={'factory'} onClick={addCoins}>
+					<button className={'factory'} onClick={() => {
+						recordClick();
+						addCoins();
+					}}>
 						<img src={''} alt={'the factory'}/>
 					</button>
 				</>
