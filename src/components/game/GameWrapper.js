@@ -26,8 +26,8 @@ const saveState = (state) => {
 const loadState = () => {
 	const loadedState = JSON.parse(localStorage.getItem('gameState'));
 	if (loadedState !== null) {
-		loadedState.upgrades = loadUpgrades('factory', loadedState.upgrades);
-		loadedState.workers = loadWorkers('factory', loadedState.workers);
+		loadedState.upgrades = loadUpgrades('factory', loadedState.upgrades || []);
+		loadedState.workers = loadWorkers('factory', loadedState.workers || []);
 		return loadedState;
 	}
 	else {
