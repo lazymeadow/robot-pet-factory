@@ -21,34 +21,41 @@ export default function Factory () {
 							</TabsContainer>
 							<TabContent tabKey={'upgrades'}>
 								<span>{totalCoins} C</span>
-								{availableUpgrades.map(upgrade => {
-									let extraClass = '';
-									let helperText = '';
-									if (upgrade.purchased) {
-										extraClass = 'unavailable';
-										helperText = 'You already have this!';
-									}
-									else if (upgrade.cost > totalCoins) {
-										extraClass = 'expensive';
-										helperText = 'You can\'t buy this yet.';
-									}
-									else {
-										helperText = 'You can buy this!';
-									}
-
+								{availableUpgrades.map(({categoryName, upgrades}) => {
 									return (
-										<div key={upgrade.id}
-											 className={`upgrade ${extraClass}`}
-											 role={'button'}
-											 onClick={() => buyUpgrade('factory', upgrade.id)}
-										>
-											<div className={'upgrade-title'}>
-												<h3>{upgrade.name}</h3>
-												{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
-											</div>
-											<p>{upgrade.description}</p>
-											<small>{helperText}</small>
-										</div>
+										<>
+											<h3>{categoryName}</h3>
+										{upgrades.map(upgrade => {
+											let extraClass = '';
+											let helperText = '';
+											if (upgrade.purchased) {
+												extraClass = 'unavailable';
+												helperText = 'You already have this!';
+											}
+											else if (upgrade.cost > totalCoins) {
+												extraClass = 'expensive';
+												helperText = 'You can\'t buy this yet.';
+											}
+											else {
+												helperText = 'You can buy this!';
+											}
+
+											return (
+												<div key={upgrade.id}
+													 className={`upgrade ${extraClass}`}
+													 role={'button'}
+													 onClick={() => buyUpgrade('factory', upgrade.id)}
+												>
+													<div className={'upgrade-title'}>
+														<h4>{upgrade.name}</h4>
+														{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
+													</div>
+													<p>{upgrade.description}</p>
+													<small>{helperText}</small>
+												</div>
+											);
+										})}
+										</>
 									);
 								})}
 							</TabContent>
@@ -102,11 +109,11 @@ export default function Factory () {
 						recordClick();
 						addCoins();
 					}}>
-						<img src={''} alt={'the factory - click to make wires'}/>
+						<img src={''} alt={'the factory - click to make parts'}/>
 					</button>
 					<div>
 						<ol>
-							{upgrades.map(upgrade => <li key={upgrade.id}>{upgrade.name}</li>)}
+							{/*{upgrades.map(upgrade => <li key={upgrade.id}>{upgrade.name}</li>)}*/}
 						</ol>
 					</div>
 				</>

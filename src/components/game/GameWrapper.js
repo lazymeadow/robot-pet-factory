@@ -1,6 +1,10 @@
 import {createContext, useReducer} from 'react';
-import {canSeeWorkers, defaultFactoryUpgrades, loadUpgrades, unlockableUpgrades} from './upgrades';
 import {getWorkerById, loadWorkers, unlockableWorkers, updateIntervals} from './workers';
+import {
+	findUpgradeById,
+	getAvailableUpgradesForDisplay, getFactoryDefault,
+	getSingleClickIncrement
+} from '../../services/upgrades/service';
 
 
 const GameContext = createContext();
@@ -16,8 +20,7 @@ const actionTypes = {
 const saveState = (state) => {
 	const stateToSave = {
 		...state,
-		upgrades: state.upgrades.map(upgrade => upgrade.id),
-		workers: Object.fromEntries(state.workers.map(worker => [worker.id, worker.count]))
+		// workers: Object.fromEntries(state.workers.map(worker => [worker.id, worker.count]))
 	};
 
 	localStorage.setItem('gameState', JSON.stringify(stateToSave));
@@ -26,8 +29,7 @@ const saveState = (state) => {
 const loadState = () => {
 	const loadedState = JSON.parse(localStorage.getItem('gameState'));
 	if (loadedState !== null) {
-		loadedState.upgrades = loadUpgrades('factory', loadedState.upgrades || []);
-		loadedState.workers = loadWorkers('factory', loadedState.workers || []);
+		// loadedState.workers = loadWorkers('factory', loadedState.workers || []);
 		return loadedState;
 	}
 	else {
@@ -36,7 +38,7 @@ const loadState = () => {
 			totalCoins: 0,
 			lifetimeCoins: 0,
 			workers: [],
-			upgrades: defaultFactoryUpgrades
+			upgrades: getFactoryDefault()
 		};
 	}
 };
@@ -55,10 +57,7 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.addCoins:
-			let countPerClick = state.upgrades.reduce((acc, cur) => acc + cur.clickIncrement, 0);
-			let multiplier = state.upgrades.reduce((acc, cur) => acc * cur.clickMultiplier, 1);
-			// calculate the coins to add: always use multiplier on the total clicks
-			const numCoinsToAdd = (countPerClick) * multiplier;
+			const numCoinsToAdd = getSingleClickIncrement(state);
 
 			totalCoins = state.totalCoins + numCoinsToAdd;
 
@@ -72,15 +71,17 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.buyUpgrade:
+			// if you've already bought it, ignore this
 			if (state.upgrades.findIndex(upgrade => upgrade.id === action.payload.id) >= 0) {
 				return state;
 			}
-			const item = unlockableUpgrades[action.payload.type].find(upgrade => upgrade.id === action.payload.id);
+			const item = findUpgradeById(action.payload.id);
+			// if you can't afford it, then also ignore it TODO: should i put cost in the payload of this action?
 			if (state.totalCoins < item.cost) {
 				return state;
 			}
 
-			newState = {...state, upgrades: [...state.upgrades, item], totalCoins: state.totalCoins - item.cost};
+			newState = {...state, upgrades: [...state.upgrades, item.id], totalCoins: state.totalCoins - item.cost};
 			saveState(newState);
 			return newState;
 		case actionTypes.buyWorker:
@@ -90,6 +91,7 @@ const gameReducer = (state, action) => {
 					return state;
 				}
 				foundWorker.addWorker();
+				// saveState(newState);
 				newState = {...state, totalCoins: state.totalCoins - foundWorker.cost};
 			}
 			else {
@@ -114,20 +116,12 @@ const gameReducer = (state, action) => {
 function GameWrapper ({children}) {
 	const [state, dispatch] = useReducer(gameReducer, {}, loadState);
 
-	updateIntervals(state, handleAutoIncrement(dispatch));
-
-	const getAvailableUpgrades = (type) => {
-		const upgradesList = unlockableUpgrades[type];
-		return upgradesList.filter(upgrade => {
-			// the upgrade must not have been purchased AND must be available by upgrade criteria
-			upgrade.purchased = state.upgrades.findIndex((value) => value.id === upgrade.id) >= 0;
-			return upgrade.isVisible(state);
-		});
-	};
+	// updateIntervals(state, handleAutoIncrement(dispatch));
 
 	const getAvailableWorkers = (type) => {
-		const workerList = [...unlockableWorkers[type]];
-		return workerList.filter(worker => worker.isVisible(state));
+		// const workerList = [...unlockableWorkers[type]];
+		// return workerList.filter(worker => worker.isVisible(state));
+		return [];
 	};
 
 
@@ -140,11 +134,12 @@ function GameWrapper ({children}) {
 				buyUpgrade: (type, id) => dispatch({type: actionTypes.buyUpgrade, payload: {type, id}}),
 				buyWorker: (type, id) => {
 					dispatch({type: actionTypes.buyWorker, payload: {type, id}});
-					updateIntervals(state, handleAutoIncrement(dispatch));
+					// updateIntervals(state, handleAutoIncrement(dispatch));
 				},
-				getAvailableUpgrades,
+				getAvailableUpgrades: () => getAvailableUpgradesForDisplay(state),
 				getAvailableWorkers,
-				canSeeWorkers: canSeeWorkers(state)
+				// canSeeWorkers: canSeeWorkers(state)
+				canSeeWorkers: false
 			}}
 		>
 			{children}
