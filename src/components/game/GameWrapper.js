@@ -21,8 +21,18 @@ const saveState = (state) => {
 
 const loadState = () => {
 	const loadedState = JSON.parse(localStorage.getItem('gameState'));
-	loadedState.upgrades = loadUpgrades('factory', loadedState.upgrades);
-	return loadedState;
+	if (loadedState !== null) {
+		loadedState.upgrades = loadUpgrades('factory', loadedState.upgrades);
+		return loadedState;
+	}
+	else {
+		return {
+			totalClicks: 0,
+			totalCoins: 0,
+			lifetimeCoins: 0,
+			upgrades: defaultFactoryUpgrades
+		};
+	}
 };
 
 const gameReducer = (state, action) => {
@@ -62,28 +72,14 @@ const gameReducer = (state, action) => {
 };
 
 function GameWrapper ({children}) {
-	const getInitialState = () => {
-		const gameState = loadState();
-		if (gameState !== null) {
-			return gameState;
-		}
-		return {
-			totalClicks: 0,
-			totalCoins: 0,
-			lifetimeCoins: 0,
-			upgrades: defaultFactoryUpgrades
-		};
-	};
-
-	const [state, dispatch] = useReducer(gameReducer, {}, getInitialState);
+	const [state, dispatch] = useReducer(gameReducer, {}, loadState);
 
 	const getAvailableUpgrades = (type) => {
 		const upgradesList = unlockableUpgrades[type];
 		return upgradesList.filter(upgrade => {
 			// the upgrade must not have been purchased AND must be available by upgrade criteria
 			upgrade.purchased = state.upgrades.findIndex((value) => value.id === upgrade.id) >= 0;
-			let visible = upgrade.isVisible(state);
-			return visible;
+			return upgrade.isVisible(state);
 		});
 	};
 
