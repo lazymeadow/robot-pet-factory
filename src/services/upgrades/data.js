@@ -14,7 +14,8 @@ const typeNames = {
 	}
 };
 
-export const getBaseName = (type) => typeNames[type].plural;
+// wow
+export const getBaseName = (type) => typeNames[type].plural.charAt(0).toUpperCase() + typeNames[type].plural.slice(1, typeNames[type].plural.length);
 export const getBaseDesc = (type, price) => `Every click makes 1 ${typeNames[type].singular}, worth ${price} C.`;
 export const getQuantityDesc = (type, quantity, level) => {
 	if (level === 3) {

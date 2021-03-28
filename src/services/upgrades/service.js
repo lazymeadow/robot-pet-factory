@@ -1,7 +1,8 @@
 import {
 	factoryPartUpgrades,
 	getBaseDesc,
-	getBaseName, getDefaultFactoryUpgrades,
+	getBaseName,
+	getDefaultFactoryUpgrades,
 	getQualityDesc,
 	getQualityName,
 	getQuantityDesc,

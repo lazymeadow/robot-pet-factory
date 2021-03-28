@@ -113,6 +113,7 @@ export default function Factory () {
 							<img src={''} alt={'the factory - click to make parts'}/>
 						</button>
 						<div>
+							<h3>Upgrades you have:</h3>
 							<ol>
 								{upgrades.map(upgrade => <li key={upgrade.id}>{upgrade.name}</li>)}
 							</ol>
