@@ -1,4 +1,3 @@
-// import {ViewContext} from '../../App';
 import TwoPanel from '../TwoPanel';
 import {Tab, TabContent, Tabs, TabsContainer} from '../Tabs';
 import {GameContext} from '../game/GameWrapper';
@@ -7,58 +6,74 @@ import {GameContext} from '../game/GameWrapper';
 export default function Factory () {
 	const renderTabs = () => (
 		<GameContext.Consumer>
-			{({buyUpgrade, getAvailableUpgrades, lifetimeCoins, totalClicks, totalCoins}) => (
-				<>
-					<h2>Factory</h2>
-					<Tabs>
-						<TabsContainer>
-							<Tab tabKey={0}>Upgrades</Tab>
-							<Tab tabKey={1}>Stats</Tab>
-							<Tab tabKey={2}>Achievements</Tab>
-						</TabsContainer>
-						<TabContent tabKey={0}>
-							<span>{totalCoins} C</span>
-							{getAvailableUpgrades('factory').map(upgrade => {
-								let extraClass = '';
-								let helperText = '';
-								if (upgrade.purchased) {
-									extraClass = 'unavailable';
-									helperText = 'You already have this!';
-								}
-								else if (upgrade.cost > totalCoins) {
-									extraClass = 'expensive';
-									helperText = 'You can\'t buy this yet.';
-								}
-								else {
-									helperText = 'You can buy this!';
-								}
+			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, lifetimeCoins, totalClicks, totalCoins}) => {
+				const availableUpgrades = getAvailableUpgrades('factory');
+				const availableWorkers = getAvailableWorkers('factory');
+				return (
+					<>
+						<h2>Factory</h2>
+						<Tabs defaultTabKey={'upgrades'}>
+							<TabsContainer>
+								<Tab tabKey={'upgrades'}>Upgrades</Tab>
+								{canSeeWorkers && <Tab tabKey={'workers'}>Workers</Tab>}
+								<Tab tabKey={'stats'}>Stats</Tab>
+								<Tab tabKey={'achievements'}>Achievements</Tab>
+							</TabsContainer>
+							<TabContent tabKey={'upgrades'}>
+								<span>{totalCoins} C</span>
+								{availableUpgrades.map(upgrade => {
+									let extraClass = '';
+									let helperText = '';
+									if (upgrade.purchased) {
+										extraClass = 'unavailable';
+										helperText = 'You already have this!';
+									}
+									else if (upgrade.cost > totalCoins) {
+										extraClass = 'expensive';
+										helperText = 'You can\'t buy this yet.';
+									}
+									else {
+										helperText = 'You can buy this!';
+									}
 
-								return (
-									<div key={upgrade.id}
-										 className={`upgrade ${extraClass}`}
-										 role={'button'}
-										 onClick={() => buyUpgrade('factory', upgrade.id)}
-									>
-										<div className={'upgrade-title'}>
-											<h3>{upgrade.name}</h3>
-											{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
+									return (
+										<div key={upgrade.id}
+											 className={`upgrade ${extraClass}`}
+											 role={'button'}
+											 onClick={() => buyUpgrade('factory', upgrade.id)}
+										>
+											<div className={'upgrade-title'}>
+												<h3>{upgrade.name}</h3>
+												{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
+											</div>
+											<p>{upgrade.description}</p>
+											<small>{helperText}</small>
 										</div>
-										<p>{upgrade.description}</p>
-										<small>{helperText}</small>
+									);
+								})}
+							</TabContent>
+							<TabContent tabKey={'stats'}>
+								<ul>
+									<li>Click Count: {totalClicks}</li>
+									<li>Total Coins Earned: {lifetimeCoins} C</li>
+								</ul>
+							</TabContent>
+							<TabContent tabKey={'achievements'}>Achivements go here</TabContent>
+							<TabContent tabKey={'workers'}>
+								{availableWorkers.map(worker => (
+									<div key={worker.id}
+										 role={'button'}
+										 onClick={() => buyWorker('factory', worker.id)}
+									>
+										<h3>{worker.name} ({worker.count})</h3>
+										<p>{worker.description}</p>
 									</div>
-								);
-							})}
-						</TabContent>
-						<TabContent tabKey={1}>
-							<ul>
-								<li>Click Count: {totalClicks}</li>
-								<li>Total Coins Earned: {lifetimeCoins} C</li>
-							</ul>
-						</TabContent>
-						<TabContent tabKey={2}>Achivements go here</TabContent>
-					</Tabs>
-				</>
-			)}
+								))}
+							</TabContent>
+						</Tabs>
+					</>
+				);
+			}}
 		</GameContext.Consumer>
 	);
 
@@ -70,7 +85,7 @@ export default function Factory () {
 						recordClick();
 						addCoins();
 					}}>
-						<img src={''} alt={'the factory'}/>
+						<img src={''} alt={'the factory - click to make wires'}/>
 					</button>
 					<div>
 						<ol>

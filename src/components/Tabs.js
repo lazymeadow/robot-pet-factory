@@ -3,8 +3,8 @@ import {createContext, useState} from 'react';
 
 const TabContext = createContext();
 
-function Tabs ({children}) {
-	const [currentTab, setCurrentTab] = useState(0);
+function Tabs ({children, defaultTabKey}) {
+	const [currentTab, setCurrentTab] = useState(defaultTabKey);
 	return (
 		<TabContext.Provider value={{
 			currentTab,
