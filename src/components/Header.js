@@ -9,7 +9,7 @@ export default function Header () {
 				<GameContext.Consumer>
 					{({totalCoins}) => (
 						<header>
-							<h1><a href={'/'}>Robot Pets</a></h1>
+							<h1 role={"button"} onClick={showOverview}>Robot Pets</h1>
 							<nav>
 								<ol>
 									<li className={isCurrentViewOverview() ? 'current' : ''}

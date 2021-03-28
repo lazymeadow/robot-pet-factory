@@ -21,6 +21,10 @@ h1, h2, h3, h4, h5, h6, nav {
   font-family: $heading-font-rule;
 }
 
+*[role=button] {
+  cursor: pointer;
+}
+
 .dashboard {
   display: flex;
   flex-direction: column;
@@ -32,7 +36,7 @@ h1, h2, h3, h4, h5, h6, nav {
     flex: 0 0 auto;
     background-color: $dark;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
     color: white;
     padding: 32px;
 
@@ -47,16 +51,32 @@ h1, h2, h3, h4, h5, h6, nav {
 
     & nav {
       font-size: 1.5em;
+      margin-left: 64px;
 
       & ol {
         margin: 0;
+        padding: 0;
         list-style-type: none;
 
         & li {
           display: inline;
-          padding: 0 16px;
+          padding: 0 0 0 32px;
+          margin-left: 32px;
+          position: relative;
+
+          &.current::before {
+            content: '▻';
+            position: absolute;
+            left: 0;
+            line-height: 24px;
+          }
         }
       }
+    }
+
+    & div:last-child {
+      flex: 1 0 auto;
+      text-align: right;
     }
   }
 
