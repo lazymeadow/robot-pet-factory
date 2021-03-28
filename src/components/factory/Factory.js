@@ -52,7 +52,7 @@ export default function Factory () {
 						<TabContent tabKey={1}>
 							<ul>
 								<li>Click Count: {totalClicks}</li>
-								<li>Total Coins Earned: {lifetimeCoins}</li>
+								<li>Total Coins Earned: {lifetimeCoins} C</li>
 							</ul>
 						</TabContent>
 						<TabContent tabKey={2}>Achivements go here</TabContent>
