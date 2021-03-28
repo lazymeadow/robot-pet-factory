@@ -1,6 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+
+$heading-font-rule: 'Major Mono Display', monospace;
+;
+$body-font-rule: 'Syne Mono', monospace;
 $dark: #282C34;
-$light: #D3D3D3;  // lightgray
-$medium: #696969;  // dimgray
+$light: #D3D3D3; // lightgray
+$medium: #696969; // dimgray
+
+body {
+  font-family: $body-font-rule;
+}
+
+button {
+  font-family: $body-font-rule;
+
+}
+
+h1, h2, h3, h4, h5, h6, nav {
+  font-family: $heading-font-rule;
+}
 
 .dashboard {
   display: flex;
@@ -14,44 +33,31 @@ $medium: #696969;  // dimgray
     background-color: $dark;
     display: flex;
     justify-content: space-between;
-    font-size: calc(10px + 2vmin);
     color: white;
     padding: 32px;
-
 
     & a {
       text-decoration: none;
       color: white;
     }
 
-    & button {
-      color: white;
-      background-color: transparent;
-      border: none;
-      font-size: .75em;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
     & h1 {
-      text-transform: uppercase;
       margin: 0;
-      font-size: 1.5em;
     }
 
-    & nav ol {
-      margin: 0;
-      list-style-type: none;
+    & nav {
+      font-size: 1.5em;
 
-      & li {
-        display: inline;
-        padding: 0 16px;
+      & ol {
+        margin: 0;
+        list-style-type: none;
+
+        & li {
+          display: inline;
+          padding: 0 16px;
+        }
       }
     }
-  }
-
-  & h2 {
-    text-transform: uppercase;
   }
 
   & > div {
