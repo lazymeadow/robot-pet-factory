@@ -10,7 +10,6 @@ export default function Factory () {
 			{({buyUpgrade, getAvailableUpgrades, lifetimeCoins, totalClicks, totalCoins}) => (
 				<>
 					<h2>Factory</h2>
-					<span>{totalCoins} C</span>
 					<Tabs>
 						<TabsContainer>
 							<Tab tabKey={0}>Upgrades</Tab>
@@ -18,6 +17,7 @@ export default function Factory () {
 							<Tab tabKey={2}>Achievements</Tab>
 						</TabsContainer>
 						<TabContent tabKey={0}>
+							<span>{totalCoins} C</span>
 							{getAvailableUpgrades('factory').map(upgrade => {
 								let extraClass = '';
 								let helperText = '';

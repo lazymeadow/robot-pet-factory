@@ -1,5 +1,5 @@
 import {createContext, useReducer} from 'react';
-import {defaultFactoryUpgrades, unlockableUpgrades} from './data';
+import {defaultFactoryUpgrades, loadUpgrades, unlockableUpgrades} from './upgrades';
 
 
 const GameContext = createContext();
@@ -11,11 +11,18 @@ const actionTypes = {
 };
 
 const saveState = (state) => {
-	localStorage.setItem('gameState', JSON.stringify(state));
+	const stateToSave = {
+		...state,
+		upgrades: state.upgrades.map(upgrade => upgrade.id)
+	};
+
+	localStorage.setItem('gameState', JSON.stringify(stateToSave));
 };
 
 const loadState = () => {
-	return JSON.parse(localStorage.getItem('gameState'));
+	const loadedState = JSON.parse(localStorage.getItem('gameState'));
+	loadedState.upgrades = loadUpgrades('factory', loadedState.upgrades);
+	return loadedState;
 };
 
 const gameReducer = (state, action) => {
@@ -27,10 +34,10 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.addCoins:
-			let extraClicks = state.upgrades.reduce((acc, cur) => acc + cur.clickIncrement, 0);
+			let countPerClick = state.upgrades.reduce((acc, cur) => acc + cur.clickIncrement, 0);
 			let multiplier = state.upgrades.reduce((acc, cur) => acc * cur.clickMultiplier, 1);
 			// calculate the coins to add: always use multiplier on the total clicks
-			const numCoinsToAdd = (1 + extraClicks) * multiplier;
+			const numCoinsToAdd = (countPerClick) * multiplier;
 
 			const totalCoins = state.totalCoins + numCoinsToAdd;
 
@@ -75,7 +82,8 @@ function GameWrapper ({children}) {
 		return upgradesList.filter(upgrade => {
 			// the upgrade must not have been purchased AND must be available by upgrade criteria
 			upgrade.purchased = state.upgrades.findIndex((value) => value.id === upgrade.id) >= 0;
-			return upgrade.isUnlocked(state);
+			let visible = upgrade.isVisible(state);
+			return visible;
 		});
 	};
 
@@ -87,8 +95,8 @@ function GameWrapper ({children}) {
 				addCoins: () => dispatch({type: actionTypes.addCoins}),
 				buyUpgrade: (type, id) => dispatch({type: actionTypes.buyUpgrade, payload: {type, id}}),
 				getAvailableUpgrades
-			}
-		}>
+			}}
+		>
 			{children}
 		</GameContext.Provider>
 	);
