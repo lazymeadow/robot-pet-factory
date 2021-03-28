@@ -34,7 +34,7 @@ const gameReducer = (state, action) => {
 
 			const totalCoins = state.totalCoins + numCoinsToAdd;
 
-			newState = {...state, totalCoins};
+			newState = {...state, totalCoins, lifetimeCoins: state.lifetimeCoins + numCoinsToAdd};
 			saveState(newState);
 			return newState;
 		case actionTypes.buyUpgrade:
@@ -63,6 +63,7 @@ function GameWrapper ({children}) {
 		return {
 			totalClicks: 0,
 			totalCoins: 0,
+			lifetimeCoins: 0,
 			upgrades: defaultFactoryUpgrades
 		};
 	};

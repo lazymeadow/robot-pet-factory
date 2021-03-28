@@ -154,9 +154,15 @@ h1, h2, h3, h4, h5, h6, nav {
             border: 1px solid $light;
             padding: 8px;
 
-            & h3 {
-              margin: 4px 0;
+            & .upgrade-title {
+              display: flex;
+              justify-content: space-between;
+
+              & h3 {
+                margin: 4px 0;
+              }
             }
+
             & p {
               margin: 4px 0;
             }

@@ -7,7 +7,7 @@ import {GameContext} from '../game/GameWrapper';
 export default function Factory () {
 	const renderTabs = () => (
 		<GameContext.Consumer>
-			{({buyUpgrade, getAvailableUpgrades, totalClicks, totalCoins}) => (
+			{({buyUpgrade, getAvailableUpgrades, lifetimeCoins, totalClicks, totalCoins}) => (
 				<>
 					<h2>Factory</h2>
 					<Tabs>
@@ -38,7 +38,10 @@ export default function Factory () {
 										 role={'button'}
 										 onClick={() => buyUpgrade('factory', upgrade.id)}
 									>
-										<h3>{upgrade.name}</h3>
+										<div className={'upgrade-title'}>
+											<h3>{upgrade.name}</h3>
+											{!upgrade.purchased && <span>COST: {upgrade.cost}C</span>}
+										</div>
 										<p>{upgrade.description}</p>
 										<small>{helperText}</small>
 									</div>
@@ -49,7 +52,7 @@ export default function Factory () {
 							Stats go here
 							<ul>
 								<li>Click Count: {totalClicks}</li>
-								<li>Total Coins: {totalCoins}</li>
+								<li>Total Coins Earned: {lifetimeCoins}</li>
 							</ul>
 						</TabContent>
 						<TabContent tabKey={2}>Achivements go here</TabContent>
