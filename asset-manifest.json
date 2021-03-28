@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/robot-pet-factory/static/css/main.d300f184.chunk.css",
-    "main.js": "/robot-pet-factory/static/js/main.2e8a281c.chunk.js",
-    "main.js.map": "/robot-pet-factory/static/js/main.2e8a281c.chunk.js.map",
+    "main.js": "/robot-pet-factory/static/js/main.f0af3f97.chunk.js",
+    "main.js.map": "/robot-pet-factory/static/js/main.f0af3f97.chunk.js.map",
     "runtime-main.js": "/robot-pet-factory/static/js/runtime-main.97ffa8e2.js",
     "runtime-main.js.map": "/robot-pet-factory/static/js/runtime-main.97ffa8e2.js.map",
-    "static/js/2.c2936efa.chunk.js": "/robot-pet-factory/static/js/2.c2936efa.chunk.js",
-    "static/js/2.c2936efa.chunk.js.map": "/robot-pet-factory/static/js/2.c2936efa.chunk.js.map",
+    "static/js/2.f9ebdc50.chunk.js": "/robot-pet-factory/static/js/2.f9ebdc50.chunk.js",
+    "static/js/2.f9ebdc50.chunk.js.map": "/robot-pet-factory/static/js/2.f9ebdc50.chunk.js.map",
     "static/js/3.d07667d2.chunk.js": "/robot-pet-factory/static/js/3.d07667d2.chunk.js",
     "static/js/3.d07667d2.chunk.js.map": "/robot-pet-factory/static/js/3.d07667d2.chunk.js.map",
     "index.html": "/robot-pet-factory/index.html",
     "static/css/main.d300f184.chunk.css.map": "/robot-pet-factory/static/css/main.d300f184.chunk.css.map",
-    "static/js/2.c2936efa.chunk.js.LICENSE.txt": "/robot-pet-factory/static/js/2.c2936efa.chunk.js.LICENSE.txt"
+    "static/js/2.f9ebdc50.chunk.js.LICENSE.txt": "/robot-pet-factory/static/js/2.f9ebdc50.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.97ffa8e2.js",
-    "static/js/2.c2936efa.chunk.js",
+    "static/js/2.f9ebdc50.chunk.js",
     "static/css/main.d300f184.chunk.css",
-    "static/js/main.2e8a281c.chunk.js"
+    "static/js/main.f0af3f97.chunk.js"
   ]
 }
