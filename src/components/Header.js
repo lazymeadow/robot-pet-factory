@@ -1,4 +1,4 @@
-import {GameContext} from './GameWrapper';
+import {GameContext} from './game/GameWrapper';
 import {ViewContext} from '../App';
 
 
@@ -9,7 +9,7 @@ export default function Header () {
 				<GameContext.Consumer>
 					{({totalCoins}) => (
 						<header>
-							<h1 role={"button"} onClick={showOverview}>Robot Pets</h1>
+							<h1 role={"button"} onClick={showOverview}>Robot Pet Factory</h1>
 							<nav>
 								<ol>
 									<li className={isCurrentViewOverview() ? 'current' : ''}

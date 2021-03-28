@@ -1,13 +1,13 @@
 // import {ViewContext} from '../../App';
 import TwoPanel from '../TwoPanel';
 import {Tab, TabContent, Tabs, TabsContainer} from '../Tabs';
-import {GameContext} from '../GameWrapper';
+import {GameContext} from '../game/GameWrapper';
 
 
 export default function Factory () {
 	const renderTabs = () => (
 		<GameContext.Consumer>
-			{({totalClicks, totalCoins}) => (
+			{({buyUpgrade, getAvailableUpgrades, totalClicks, totalCoins}) => (
 				<>
 					<h2>Factory</h2>
 					<Tabs>
@@ -16,7 +16,35 @@ export default function Factory () {
 							<Tab tabKey={1}>Stats</Tab>
 							<Tab tabKey={2}>Achievements</Tab>
 						</TabsContainer>
-						<TabContent tabKey={0}>Upgrades go here</TabContent>
+						<TabContent tabKey={0}>
+							{getAvailableUpgrades('factory').map(upgrade => {
+								let extraClass = '';
+								let helperText = '';
+								if (upgrade.purchased) {
+									extraClass = 'unavailable';
+									helperText = 'You already have this!';
+								}
+								else if (upgrade.cost > totalCoins) {
+									extraClass = 'expensive';
+									helperText = 'You can\'t buy this yet.';
+								}
+								else {
+									helperText = 'You can buy this!';
+								}
+
+								return (
+									<div key={upgrade.id}
+										 className={`upgrade ${extraClass}`}
+										 role={'button'}
+										 onClick={() => buyUpgrade('factory', upgrade.id)}
+									>
+										<h3>{upgrade.name}</h3>
+										<p>{upgrade.description}</p>
+										<small>{helperText}</small>
+									</div>
+								);
+							})}
+						</TabContent>
 						<TabContent tabKey={1}>
 							Stats go here
 							<ul>
@@ -33,15 +61,19 @@ export default function Factory () {
 
 	const renderMain = () => (
 		<GameContext.Consumer>
-			{({addCoins, recordClick}) => (
+			{({addCoins, recordClick, upgrades}) => (
 				<>
-					<h2>Here we go</h2>
 					<button className={'factory'} onClick={() => {
 						recordClick();
 						addCoins();
 					}}>
 						<img src={''} alt={'the factory'}/>
 					</button>
+					<div>
+						<ol>
+							{upgrades.map(upgrade => <li key={upgrade.id}>{upgrade.name}</li>)}
+						</ol>
+					</div>
 				</>
 			)}
 		</GameContext.Consumer>

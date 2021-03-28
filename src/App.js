@@ -3,7 +3,7 @@ import {createContext, useState} from 'react';
 import Overview from './components/overview/Overview';
 import Factory from './components/factory/Factory';
 import Kennel from './components/kennel/Kennel';
-import {GameWrapper} from './components/GameWrapper';
+import {GameWrapper} from './components/game/GameWrapper';
 import Header from './components/Header';
 
 
