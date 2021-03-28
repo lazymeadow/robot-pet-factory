@@ -10,6 +10,7 @@ export default function Factory () {
 			{({buyUpgrade, getAvailableUpgrades, lifetimeCoins, totalClicks, totalCoins}) => (
 				<>
 					<h2>Factory</h2>
+					<span>{totalCoins} C</span>
 					<Tabs>
 						<TabsContainer>
 							<Tab tabKey={0}>Upgrades</Tab>
@@ -40,7 +41,7 @@ export default function Factory () {
 									>
 										<div className={'upgrade-title'}>
 											<h3>{upgrade.name}</h3>
-											{!upgrade.purchased && <span>COST: {upgrade.cost}C</span>}
+											{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
 										</div>
 										<p>{upgrade.description}</p>
 										<small>{helperText}</small>
@@ -49,7 +50,6 @@ export default function Factory () {
 							})}
 						</TabContent>
 						<TabContent tabKey={1}>
-							Stats go here
 							<ul>
 								<li>Click Count: {totalClicks}</li>
 								<li>Total Coins Earned: {lifetimeCoins}</li>

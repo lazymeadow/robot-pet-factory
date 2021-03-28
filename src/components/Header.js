@@ -32,7 +32,7 @@ export default function Header () {
 									</li>
 								</ol>
 							</nav>
-							<div>Total Coins: {totalCoins}</div>
+							<div>{totalCoins} C</div>
 						</header>
 					)}
 				</GameContext.Consumer>
