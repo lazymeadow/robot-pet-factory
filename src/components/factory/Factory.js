@@ -60,15 +60,32 @@ export default function Factory () {
 							</TabContent>
 							<TabContent tabKey={'achievements'}>Achivements go here</TabContent>
 							<TabContent tabKey={'workers'}>
-								{availableWorkers.map(worker => (
-									<div key={worker.id}
-										 role={'button'}
-										 onClick={() => buyWorker('factory', worker.id)}
-									>
-										<h3>{worker.name} ({worker.count})</h3>
-										<p>{worker.description}</p>
-									</div>
-								))}
+								{availableWorkers.map(worker => {
+									let extraClass = '';
+									let helperText = '';
+									if (worker.cost > totalCoins) {
+										extraClass = 'expensive';
+										helperText = 'You can\'t buy this right now.';
+									}
+									else {
+										helperText = 'You can buy this!';
+									}
+
+									return (
+										<div key={worker.id}
+											 className={`upgrade ${extraClass}`}
+											 role={'button'}
+											 onClick={() => buyWorker('factory', worker.id)}
+										>
+											<div className={'upgrade-title'}>
+												<h3>{worker.name} ({worker.count})</h3>
+												<span>COST: {worker.cost} C</span>
+											</div>
+											<p>{worker.description}</p>
+											<small>{helperText}</small>
+										</div>
+									);
+								})}
 							</TabContent>
 						</Tabs>
 					</>
