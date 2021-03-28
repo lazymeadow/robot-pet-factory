@@ -45,7 +45,7 @@ class Worker {
 
 const worker1 = new Worker(
 	'Mouse Droid',
-	'They don\'t do much, but the can make wires. How? You don\'t wanna know.',
+	'They don\'t do much, but they can make 1 wire every 3 seconds. How? You don\'t wanna know.',
 	3000,
 	1,
 	25
