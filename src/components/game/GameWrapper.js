@@ -10,6 +10,7 @@ import {
 const GameContext = createContext();
 
 const actionTypes = {
+	clearGameState: 'CLEAR_GAME_STATE',
 	addCoins: 'ADD_COINS',
 	autoAddCoins: 'AUTO_ADD_COINS',
 	recordClick: 'RECORD_CLICK',
@@ -108,6 +109,16 @@ const gameReducer = (state, action) => {
 				saveState(newState);
 			}
 			return newState;
+		case actionTypes.clearGameState:
+			newState = {
+				totalClicks: 0,
+				totalCoins: 0,
+				lifetimeCoins: 0,
+				workers: [],
+				upgrades: getFactoryDefault()
+			};
+			saveState(newState);
+			return newState;
 		default:
 			return state;
 	}
@@ -140,7 +151,8 @@ function GameWrapper ({children}) {
 				getAcquiredUpgrades: () => formatUpgradesForDisplay(state),
 				getAvailableWorkers,
 				// canSeeWorkers: canSeeWorkers(state)
-				canSeeWorkers: false
+				canSeeWorkers: false,
+				resetGame: () => dispatch({type: actionTypes.clearGameState})
 			}}
 		>
 			{children}
