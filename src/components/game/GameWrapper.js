@@ -160,8 +160,7 @@ function GameWrapper ({children}) {
 				getAvailableUpgrades: () => getAvailableUpgradesForDisplay(state),
 				getAcquiredUpgrades: () => formatUpgradesForDisplay(state),
 				getAvailableWorkers,
-				// canSeeWorkers: canSeeWorkers(state)
-				canSeeWorkers: false,
+				canSeeWorkers: state.factoryLevel > 0,
 				resetGame: () => dispatch({type: actionTypes.clearGameState})
 			}}
 		>

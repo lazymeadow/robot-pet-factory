@@ -56,6 +56,42 @@ export default function Factory () {
 		});
 	};
 
+	const renderAvailableWorkers = (availableWorkers, totalCoins, buyWorker) => {
+		if (availableWorkers.length === 0) {
+			return (
+				<div>
+					No available workers!
+				</div>
+			);
+		}
+		return availableWorkers.map(worker => {
+			let extraClass = '';
+			let helperText = '';
+			if (worker.cost > totalCoins) {
+				extraClass = 'expensive';
+				helperText = 'You can\'t buy this right now.';
+			}
+			else {
+				helperText = 'You can buy this!';
+			}
+
+			return (
+				<div key={worker.id}
+					 className={`upgrade ${extraClass}`}
+					 role={'button'}
+					 onClick={() => buyWorker(worker.type, worker.id)}
+				>
+					<div className={'upgrade-title'}>
+						<h3>{worker.name} ({worker.count})</h3>
+						<span>COST: {worker.cost} C</span>
+					</div>
+					<p>{worker.description}</p>
+					<small>{helperText}</small>
+				</div>
+			);
+		});
+	};
+
 	const renderTabs = () => (
 		<GameContext.Consumer>
 			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, lifetimeCoins, totalClicks, totalCoins}) => {
@@ -82,32 +118,7 @@ export default function Factory () {
 							</TabContent>
 							<TabContent tabKey={'achievements'}>Achivements go here</TabContent>
 							<TabContent tabKey={'workers'}>
-								{availableWorkers.map(worker => {
-									let extraClass = '';
-									let helperText = '';
-									if (worker.cost > totalCoins) {
-										extraClass = 'expensive';
-										helperText = 'You can\'t buy this right now.';
-									}
-									else {
-										helperText = 'You can buy this!';
-									}
-
-									return (
-										<div key={worker.id}
-											 className={`upgrade ${extraClass}`}
-											 role={'button'}
-											 onClick={() => buyWorker(worker.type, worker.id)}
-										>
-											<div className={'upgrade-title'}>
-												<h3>{worker.name} ({worker.count})</h3>
-												<span>COST: {worker.cost} C</span>
-											</div>
-											<p>{worker.description}</p>
-											<small>{helperText}</small>
-										</div>
-									);
-								})}
+								{renderAvailableWorkers(availableWorkers, totalCoins, buyWorker)}
 							</TabContent>
 						</Tabs>
 					</>
