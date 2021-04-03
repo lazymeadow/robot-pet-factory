@@ -86,23 +86,27 @@ export const getSingleClickIncrement = (gameState) => {
 			mathsMap[type] = {
 				incrementer,
 				multiplier,
-				maxLevel: level || 0  // base unlocks don't have a level
+				incLevel: 0,
+				multLevel: 0  // base upgrades are level 0
 			};
 		}
-		else {
-			if (!!incrementer) {
-				mathsMap[type].incrementer += incrementer;
-			}
-			if (!!multiplier && level > mathsMap[type].maxLevel) {
-				mathsMap[type].multiplier = multiplier;  // multiplier always the same for any type
-				mathsMap[type].maxLevel = level;  // for calculation, level only applies to multipliers
-			}
+		if (!!incrementer && level > mathsMap[type].incLevel) {
+			mathsMap[type].incLevel = level;
+		}
+		if (!!multiplier && level > mathsMap[type].multLevel) {
+			mathsMap[type].multLevel = level;  // for calculation, level only applies to multipliers
 		}
 	});
-	// debugger
+
 	return Math.ceil(factoryUpgrades[gameState.factoryLevel].multiplier * Object.entries(mathsMap)
 		.reduce(
-			(runningTotal, [, {incrementer, multiplier, maxLevel}]) => runningTotal + (Math.pow(2, incrementer) * Math.pow(multiplier, maxLevel)),
+			(runningTotal, [, {incrementer, incLevel, multiplier, multLevel}]) => {
+				// quant/increment => incrementer * 2 ^ incLevel
+				const incTotal = incrementer * Math.pow(2, incLevel);
+				// qual/multiply => 1 @ level 0, or multiplier ^ (multLevel + 1)
+				const multTotal = multLevel > 0 ? Math.pow(multiplier, multLevel + 1) : 1;
+				return runningTotal + incTotal * multTotal;
+			},
 			0
 		));
 };

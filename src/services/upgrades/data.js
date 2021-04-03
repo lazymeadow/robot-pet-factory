@@ -112,7 +112,7 @@ export const factoryPartUpgrades = {
 			},
 			{
 				id: 'w_quant_1',
-				cost: 200,
+				cost: 250,
 				level: 2,
 				upgradeDependencies: [
 					'w_quant_0'
@@ -138,7 +138,7 @@ export const factoryPartUpgrades = {
 			},
 			{
 				id: 'w_qual_1',
-				cost: 200,
+				cost: 250,
 				level: 2,
 				upgradeDependencies: [
 					'w_qual_0'
@@ -168,7 +168,7 @@ export const factoryPartUpgrades = {
 		quantity: [
 			{
 				id: 's_quant_0',
-				cost: 750,
+				cost: 1000,
 				level: 1,
 				upgradeDependencies: [
 					's_base_0'
@@ -176,7 +176,7 @@ export const factoryPartUpgrades = {
 			},
 			{
 				id: 's_quant_1',
-				cost: 1500,
+				cost: 2500,
 				level: 2,
 				upgradeDependencies: [
 					's_quant_0'
@@ -202,7 +202,7 @@ export const factoryPartUpgrades = {
 			},
 			{
 				id: 's_qual_1',
-				cost: 2000,
+				cost: 2500,
 				level: 2,
 				upgradeDependencies: [
 					's_qual_0'
@@ -210,7 +210,7 @@ export const factoryPartUpgrades = {
 			},
 			{
 				id: 's_qual_2',
-				cost: 3000,
+				cost: 5000,
 				level: 3,
 				upgradeDependencies: [
 					's_qual_1'
