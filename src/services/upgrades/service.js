@@ -1,8 +1,8 @@
 import {
-	factoryPartUpgrades,
+	factoryPartUpgrades, factoryUpgrades,
 	getBaseDesc,
 	getBaseName,
-	getDefaultFactoryUpgrades,
+	getDefaultPartsUpgrades,
 	getQualityDesc,
 	getQualityName,
 	getQuantityDesc,
@@ -37,13 +37,22 @@ export const findUpgradeById = (id) => {
 			};
 		}
 	}
+	// next try factory upgrades
+	for (const upgrade of factoryUpgrades) {
+		if (upgrade.id === id) {
+			return {
+				...upgrade
+			};
+		}
+	}
 };
 
-export const getUpgradeForDisplayById = (id) => {
+export const getPartUpgradeForDisplayById = (id) => {
 	for (const [partType, {unlock, quantity, quality}] of Object.entries(factoryPartUpgrades)) {
 		if (unlock.id === id) {
 			return {
 				name: getBaseName(partType),
+				type: partType,
 				description: getBaseDesc(partType, unlock.incrementer),
 				cost: unlock.cost
 			};
@@ -52,6 +61,7 @@ export const getUpgradeForDisplayById = (id) => {
 		if (foundInQuantity) {
 			return {
 				name: getQuantityName(partType, foundInQuantity.level),
+				type: partType,
 				description: getQuantityDesc(partType, foundInQuantity.incrementer, foundInQuantity.level),
 				cost: unlock.cost
 			};
@@ -60,6 +70,7 @@ export const getUpgradeForDisplayById = (id) => {
 		if (foundInQuality) {
 			return {
 				name: getQualityName(partType, foundInQuality.level),
+				type: partType,
 				description: getQualityDesc(partType, foundInQuality.multiplier, foundInQuality.incrementer, foundInQuality.level),
 				cost: unlock.cost
 			};
@@ -88,11 +99,12 @@ export const getSingleClickIncrement = (gameState) => {
 			}
 		}
 	});
-	return Object.entries(mathsMap)
+	// debugger
+	return Math.ceil(factoryUpgrades[gameState.factoryLevel].multiplier * Object.entries(mathsMap)
 		.reduce(
-			(runningTotal, [, {incrementer, multiplier, maxLevel}]) => runningTotal + (incrementer * Math.pow(multiplier, maxLevel)),
+			(runningTotal, [, {incrementer, multiplier, maxLevel}]) => runningTotal + (Math.pow(2, incrementer) * Math.pow(multiplier, maxLevel)),
 			0
-		);
+		));
 };
 
 const isUpgradeAcquired = (acquiredUpgrades, upgradeToFind) => {
@@ -122,7 +134,18 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 
 	// make an array -> [{categoryName: '', upgrades: [...]}, ...]
 	const upgradesToReturn = [];
-	// 1. go through factory part upgrades
+	// 1. get the next factory level
+	if ((gameState.factoryLevel + 1) < factoryUpgrades.length) {
+		const nextFactoryLevel = factoryUpgrades[gameState.factoryLevel + 1];
+		if (isUpgradeAvailable(acquiredUpgrades, nextFactoryLevel)) {
+			upgradesToReturn.push({
+				categoryName: 'Factory Level',
+				upgrades: [factoryUpgrades[gameState.factoryLevel + 1]]
+			});
+		}
+	}
+
+	// 2. go through factory part upgrades
 	// for each key in the upgrades map (a part)
 	for (const [partType, {unlock, quantity, quality}] of Object.entries(factoryPartUpgrades)) {
 		let upgradesToAdd = [];
@@ -142,7 +165,7 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 					id: upgrade.id,
 					cost: upgrade.cost,
 					name: getQualityName(partType, upgrade.level),
-					description: getQualityDesc(partType, unlock.incrementer, upgrade.level)
+					description: getQualityDesc(partType, unlock.multiplier, unlock.incrementer, upgrade.level)
 				};
 			}));
 		}
@@ -172,8 +195,8 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 	return upgradesToReturn;
 };
 
-export const formatUpgradesForDisplay = ({upgrades: upgradeIdsToFormat}) => {
-	return upgradeIdsToFormat.map(getUpgradeForDisplayById);
+export const formatUpgradesForDisplay = ({factoryLevel, upgrades: upgradeIdsToFormat}) => {
+	return [factoryUpgrades[factoryLevel], ...upgradeIdsToFormat.map(getPartUpgradeForDisplayById)];
 }
 
-export const getFactoryDefault = () => getDefaultFactoryUpgrades();
+export const getFactoryDefault = () => getDefaultPartsUpgrades();

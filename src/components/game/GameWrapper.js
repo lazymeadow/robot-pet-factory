@@ -5,6 +5,7 @@ import {
 	getAvailableUpgradesForDisplay, getFactoryDefault,
 	getSingleClickIncrement
 } from '../../services/upgrades/service';
+import {types} from '../../services/upgrades/data';
 
 
 const GameContext = createContext();
@@ -28,10 +29,18 @@ const saveState = (state) => {
 	localStorage.setItem('gameState', JSON.stringify(stateToSave));
 };
 
+const defaultGameState = () => ({
+	factoryLevel: 0,
+		totalClicks: 0,
+		totalCoins:  99,//0,
+		lifetimeCoins: 0,
+		workers: [],
+		upgrades: getFactoryDefault()
+});
+
 const loadState = () => {
 	const loadedState = JSON.parse(localStorage.getItem('gameState'));
 	let shouldClearState = false;
-	debugger;
 	if (loadedState !== null && (!loadedState.hasOwnProperty('version') || loadedState.version < process.env.REACT_APP_VERSION)) {
 		alert('Your game version is out of date, and this game is in active development. I\'m forcing you to start from scratch.');
 		shouldClearState = true;
@@ -42,13 +51,7 @@ const loadState = () => {
 		return loadedState;
 	}
 	else {
-		return {
-			totalClicks: 0,
-			totalCoins: 0,
-			lifetimeCoins: 0,
-			workers: [],
-			upgrades: getFactoryDefault()
-		};
+		return defaultGameState();
 	}
 };
 
@@ -80,17 +83,22 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.buyUpgrade:
-			// if you've already bought it, ignore this
-			if (state.upgrades.findIndex(upgrade => upgrade.id === action.payload.id) >= 0) {
-				return state;
+			debugger;
+			if (action.payload.type === types.factory) {
+				newState = {...state, factoryLevel: state.factoryLevel + 1};
 			}
-			const item = findUpgradeById(action.payload.id);
-			// if you can't afford it, then also ignore it TODO: should i put cost in the payload of this action?
-			if (state.totalCoins < item.cost) {
-				return state;
+			else {
+				// if you've already bought it, ignore this
+				if (state.upgrades.findIndex(upgrade => upgrade.id === action.payload.id) >= 0) {
+					return state;
+				}
+				const item = findUpgradeById(action.payload.id);
+				// if you can't afford it, then also ignore it TODO: should i put cost in the payload of this action?
+				if (state.totalCoins < item.cost) {
+					return state;
+				}
+				newState = {...state, upgrades: [...state.upgrades, item.id], totalCoins: state.totalCoins - item.cost};
 			}
-
-			newState = {...state, upgrades: [...state.upgrades, item.id], totalCoins: state.totalCoins - item.cost};
 			saveState(newState);
 			return newState;
 		case actionTypes.buyWorker:
@@ -118,13 +126,7 @@ const gameReducer = (state, action) => {
 			}
 			return newState;
 		case actionTypes.clearGameState:
-			newState = {
-				totalClicks: 0,
-				totalCoins: 0,
-				lifetimeCoins: 0,
-				workers: [],
-				upgrades: getFactoryDefault()
-			};
+			newState = defaultGameState();
 			saveState(newState);
 			return newState;
 		default:

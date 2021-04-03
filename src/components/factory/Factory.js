@@ -9,6 +9,7 @@ export default function Factory () {
 			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, lifetimeCoins, totalClicks, totalCoins}) => {
 				const availableUpgrades = getAvailableUpgrades('factory');
 				const availableWorkers = getAvailableWorkers('factory');
+				console.log(availableUpgrades);
 				return (
 					<>
 						<Tabs defaultTabKey={'upgrades'}>
@@ -43,7 +44,7 @@ export default function Factory () {
 												<div key={upgrade.id}
 													 className={`upgrade ${extraClass}`}
 													 role={'button'}
-													 onClick={() => buyUpgrade('factory', upgrade.id)}
+													 onClick={() => buyUpgrade(upgrade.type, upgrade.id)}
 												>
 													<div className={'upgrade-title'}>
 														<h4>{upgrade.name}</h4>
@@ -81,7 +82,7 @@ export default function Factory () {
 										<div key={worker.id}
 											 className={`upgrade ${extraClass}`}
 											 role={'button'}
-											 onClick={() => buyWorker('factory', worker.id)}
+											 onClick={() => buyWorker(worker.type, worker.id)}
 										>
 											<div className={'upgrade-title'}>
 												<h3>{worker.name} ({worker.count})</h3>
@@ -104,6 +105,7 @@ export default function Factory () {
 		<GameContext.Consumer>
 			{({addCoins, recordClick, getAcquiredUpgrades}) => {
 				const upgrades = getAcquiredUpgrades();
+				console.log(upgrades);
 				return (
 					<>
 						<button id={'factory'} onClick={() => {
@@ -115,7 +117,10 @@ export default function Factory () {
 						<div>
 							<h3>Upgrades you have:</h3>
 							<ol>
-								{upgrades.map(upgrade => <li key={upgrade.id}>{upgrade.name}</li>)}
+								{upgrades.map(upgrade =>{
+									console.log(upgrade);
+								return <li key={upgrade.id}>{upgrade.name}</li>
+								})}
 							</ol>
 						</div>
 					</>

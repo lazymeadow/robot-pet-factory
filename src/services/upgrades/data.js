@@ -1,7 +1,8 @@
-const types = {
+export const types = {
 	part1: 'PART_1',
 	part2: 'PART_2',
-}
+	factory: 'FACTORY'
+};
 
 const typeNames = {
 	[types.part1]: {
@@ -22,7 +23,7 @@ export const getQuantityDesc = (type, quantity, level) => {
 		return `You make so many ${typeNames[type].plural}, ${quantity * Math.pow(2, level)} per click.`;
 	}
 	return `Every click makes ${quantity * Math.pow(2, level)} ${quantity > 1 ? typeNames[type].singular : typeNames[type].plural}.`;
-}
+};
 export const getQualityDesc = (type, multiplier, price, level) => {
 	if (level === 1) {
 		return `Your ${typeNames[type].plural} are better, and are worth ${price * Math.pow(multiplier, 2)} C each`;
@@ -33,7 +34,7 @@ export const getQualityDesc = (type, multiplier, price, level) => {
 	if (level === 3) {
 		return `You make the best possible ${typeNames[type].plural}, and are worth ${price * Math.pow(multiplier, 4)} C each`;
 	}
-}
+};
 
 export const getQuantityName = (type, level) => {
 	if (level === 1) {
@@ -42,10 +43,10 @@ export const getQuantityName = (type, level) => {
 	if (level === 2) {
 		return `Even more ${typeNames[type].plural}`;
 	}
-	if (level ===3) {
+	if (level === 3) {
 		return `So many ${typeNames[type].plural}`;
 	}
-}
+};
 export const getQualityName = (type, level) => {
 	if (level === 1) {
 		return `Better ${typeNames[type].plural}`;
@@ -53,10 +54,44 @@ export const getQualityName = (type, level) => {
 	if (level === 2) {
 		return `Even better ${typeNames[type].plural}`;
 	}
-	if (level ===3) {
+	if (level === 3) {
 		return `The best ${typeNames[type].plural}`;
 	}
-}
+};
+
+export const factoryUpgrades = [
+	{
+		id: 'f_0',
+		type: types.factory,
+		cost: 0,
+		multiplier: 1,
+		name: 'Basic Factory'
+	},
+	{
+		id: 'f_1',
+		type: types.factory,
+		cost: 100,
+		multiplier: 1.05,
+		name: 'Factory Level 1',
+		description: 'Your factory is 5% more effective.',
+		upgradeDependencies: [
+			'w_quant_0',
+			'w_qual_0'
+		]
+	},
+	{
+		id: 'f_2',
+		type: types.factory,
+		cost: 500,
+		multiplier: 1.10,
+		name: 'Factory Level 2',
+		description: 'Your factory is 10% more effective.',
+		upgradeDependencies: [
+			's_quant_0',
+			's_qual_0'
+		]
+	}
+];
 
 export const factoryPartUpgrades = {
 	[types.part1]: {
@@ -185,4 +220,5 @@ export const factoryPartUpgrades = {
 	}
 };
 
-export const getDefaultFactoryUpgrades = () => [factoryPartUpgrades[types.part1].unlock.id];
+export const getDefaultPartsUpgrades = () => [factoryPartUpgrades[types.part1].unlock.id];
+export const getDefaultFactoryUpgrades = () => [factoryUpgrades[0]];

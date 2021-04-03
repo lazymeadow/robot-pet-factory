@@ -19,19 +19,12 @@ export const getWorkerDesc = (type) => `Unlock ${typeNames[type].plural}`;
 
 export const factoryWorkers = {
 	[types.worker1]: {
-		unlock: {
-			id: 'worker_unlock_0',
-			cost: 500,
-			upgradeDependencies: [
-				'w_quant_0',
-				'w_qual_0'
-			]
-		},
-		worker: {
-			id: 'worker_0',
-			cost: 25,
-			incrementer: 1
-		}
+		id: 'worker_0',
+		cost: 25,
+		incrementer: 1,
+		workerDependencies: [
+			'f_1'
+		]
 	},
 	[types.worker2]: {
 		unlock: {
