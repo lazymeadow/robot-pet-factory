@@ -4,12 +4,58 @@ import {GameContext} from '../game/GameWrapper';
 
 
 export default function Factory () {
+	const renderAvailableUpgrades = (availableUpgrades, totalCoins, buyUpgrade) => {
+		if (availableUpgrades.length === 0) {
+			return (
+				<div>
+					No available upgrades!
+				</div>
+			);
+		}
+		return availableUpgrades.map(({categoryName, upgrades}) => {
+			return (
+				<>
+					<h3>{categoryName}</h3>
+					{upgrades.map(upgrade => {
+						let extraClass = '';
+						let helperText = '';
+						if (upgrade.purchased) {
+							extraClass = 'unavailable';
+							helperText = 'You already have this!';
+						}
+						else if (upgrade.cost > totalCoins) {
+							extraClass = 'expensive';
+							helperText = 'You can\'t buy this yet.';
+						}
+						else {
+							helperText = 'You can buy this!';
+						}
+
+						return (
+							<div key={upgrade.id}
+								 className={`upgrade ${extraClass}`}
+								 role={'button'}
+								 onClick={() => buyUpgrade(upgrade.type, upgrade.id)}
+							>
+								<div className={'upgrade-title'}>
+									<h4>{upgrade.name}</h4>
+									{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
+								</div>
+								<p>{upgrade.description}</p>
+								<small>{helperText}</small>
+							</div>
+						);
+					})}
+				</>
+			);
+		});
+	};
+
 	const renderTabs = () => (
 		<GameContext.Consumer>
 			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, lifetimeCoins, totalClicks, totalCoins}) => {
 				const availableUpgrades = getAvailableUpgrades('factory');
 				const availableWorkers = getAvailableWorkers('factory');
-				console.log(availableUpgrades);
 				return (
 					<>
 						<Tabs defaultTabKey={'upgrades'}>
@@ -21,43 +67,7 @@ export default function Factory () {
 							</TabsContainer>
 							<TabContent tabKey={'upgrades'}>
 								<span>{totalCoins} C</span>
-								{availableUpgrades.map(({categoryName, upgrades}) => {
-									return (
-										<>
-											<h3>{categoryName}</h3>
-										{upgrades.map(upgrade => {
-											let extraClass = '';
-											let helperText = '';
-											if (upgrade.purchased) {
-												extraClass = 'unavailable';
-												helperText = 'You already have this!';
-											}
-											else if (upgrade.cost > totalCoins) {
-												extraClass = 'expensive';
-												helperText = 'You can\'t buy this yet.';
-											}
-											else {
-												helperText = 'You can buy this!';
-											}
-
-											return (
-												<div key={upgrade.id}
-													 className={`upgrade ${extraClass}`}
-													 role={'button'}
-													 onClick={() => buyUpgrade(upgrade.type, upgrade.id)}
-												>
-													<div className={'upgrade-title'}>
-														<h4>{upgrade.name}</h4>
-														{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
-													</div>
-													<p>{upgrade.description}</p>
-													<small>{helperText}</small>
-												</div>
-											);
-										})}
-										</>
-									);
-								})}
+								{renderAvailableUpgrades(availableUpgrades, totalCoins, buyUpgrade)}
 							</TabContent>
 							<TabContent tabKey={'stats'}>
 								<ul>
@@ -105,7 +115,6 @@ export default function Factory () {
 		<GameContext.Consumer>
 			{({addCoins, recordClick, getAcquiredUpgrades}) => {
 				const upgrades = getAcquiredUpgrades();
-				console.log(upgrades);
 				return (
 					<>
 						<button id={'factory'} onClick={() => {
@@ -118,7 +127,6 @@ export default function Factory () {
 							<h3>Upgrades you have:</h3>
 							<ol>
 								{upgrades.map(upgrade =>{
-									console.log(upgrade);
 								return <li key={upgrade.id}>{upgrade.name}</li>
 								})}
 							</ol>

@@ -198,7 +198,7 @@ h1, h2, h3, h4, h5, h6, nav {
           border-top: 1px solid $dark;
           margin-top: 16px;
           padding: 16px;
-          height: calc(100% - 350px);
+          height: calc(100% - 399px); // 350 for button + 16 for margin + 16*2 for padding + 1 for border.
           overflow-y: scroll;
         }
       }
@@ -208,7 +208,6 @@ h1, h2, h3, h4, h5, h6, nav {
         height: 350px;
         border: 1px solid blue;
         background: whitesmoke;
-        //flex: 0 0 auto;
       }
     }
   }
