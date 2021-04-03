@@ -5,7 +5,7 @@ import {
 	getAvailableUpgradesForDisplay, getFactoryDefault,
 	getSingleClickIncrement
 } from '../../services/upgrades/service';
-import {types} from '../../services/upgrades/data';
+import {factoryUpgrades, types} from '../../services/upgrades/data';
 
 
 const GameContext = createContext();
@@ -83,9 +83,9 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.buyUpgrade:
-			debugger;
 			if (action.payload.type === types.factory) {
-				newState = {...state, factoryLevel: state.factoryLevel + 1};
+				const nextLevel = factoryUpgrades[state.factoryLevel + 1];
+				newState = {...state, factoryLevel: state.factoryLevel + 1, totalCoins: state.totalCoins - nextLevel.cost};
 			}
 			else {
 				// if you've already bought it, ignore this

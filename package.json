@@ -1,6 +1,6 @@
 {
   "name": "robot-pets",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "homepage": "https://lazymeadow.github.io/robot-pet-factory",
   "dependencies": {
