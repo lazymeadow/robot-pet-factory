@@ -37,12 +37,17 @@ export default function Factory () {
 								 role={'button'}
 								 onClick={() => buyUpgrade(upgrade.type, upgrade.id)}
 							>
-								<div className={'upgrade-title'}>
-									<h4>{upgrade.name}</h4>
-									{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
+								<div className={'upgrade-image'}>
+									<img src={''} alt={`${upgrade.id}`} />
 								</div>
-								<p>{upgrade.description}</p>
-								<small>{helperText}</small>
+								<div>
+									<div className={'upgrade-title'}>
+										<h4>{upgrade.name}</h4>
+										{!upgrade.purchased && <span>COST: {upgrade.cost} C</span>}
+									</div>
+									<p>{upgrade.description}</p>
+									<small>{helperText}</small>
+								</div>
 							</div>
 						);
 					})}
@@ -126,8 +131,8 @@ export default function Factory () {
 						<div>
 							<h3>Upgrades you have:</h3>
 							<ol>
-								{upgrades.map(upgrade =>{
-								return <li key={upgrade.id}>{upgrade.name}</li>
+								{upgrades.map(upgrade => {
+									return <li key={upgrade.id}>{upgrade.name}</li>;
 								})}
 							</ol>
 						</div>

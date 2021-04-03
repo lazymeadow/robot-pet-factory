@@ -157,6 +157,22 @@ h1, h2, h3, h4, h5, h6, nav {
             margin-bottom: 8px;
             border: 1px solid $light;
             padding: 8px;
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+
+            & > div.upgrade-image {
+              flex: 0 0 auto;
+              margin-right: 20px;
+              border: 1px solid blue;
+              background-color: whitesmoke;
+              width: 100px;
+              height: 100px;
+            }
+
+            & > div:not(.upgrade-image) {
+              flex: 1 1 auto;
+            }
 
             & .upgrade-title {
               display: flex;
