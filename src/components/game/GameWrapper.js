@@ -1,11 +1,14 @@
 import {createContext, useReducer} from 'react';
 import {getWorkerById, loadWorkers, unlockableWorkers, updateIntervals} from './workers';
 import {
-	findUpgradeById, formatUpgradesForDisplay,
-	getAvailableUpgradesForDisplay, getFactoryDefault,
-	getSingleClickIncrement
+	findUpgradeById,
+	formatUpgradesForDisplay,
+	getAvailableUpgradesForDisplay,
+	getFactoryDefault,
+	getSingleClickData,
+	isPartTypeUnlocked
 } from '../../services/upgrades/service';
-import {factoryUpgrades, types} from '../../services/upgrades/data';
+import {factoryUpgrades, getBaseName, partTypes, types} from '../../services/upgrades/data';
 
 
 const GameContext = createContext();
@@ -31,11 +34,12 @@ const saveState = (state) => {
 
 const defaultGameState = () => ({
 	factoryLevel: 0,
-		totalClicks: 0,
-		totalCoins:  99,//0,
-		lifetimeCoins: 0,
-		workers: [],
-		upgrades: getFactoryDefault()
+	totalClicks: 0,
+	totalCoins: 99,//0,
+	lifetimeCoins: 0,
+	partsCounts: Object.fromEntries(Object.values(partTypes).map(type => [type, 0])),
+	workers: [],
+	upgrades: getFactoryDefault()
 });
 
 const loadState = () => {
@@ -46,12 +50,14 @@ const loadState = () => {
 		shouldClearState = true;
 	}
 
+	const defaultState = defaultGameState();
+
 	if (!shouldClearState && loadedState !== null) {
 		// loadedState.workers = loadWorkers('factory', loadedState.workers || []);
-		return loadedState;
+		return {...defaultState, ...loadedState};
 	}
 	else {
-		return defaultGameState();
+		return defaultState;
 	}
 };
 
@@ -69,11 +75,15 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.addCoins:
-			const numCoinsToAdd = getSingleClickIncrement(state);
+			const {numCoinsToAdd, partsCounts} = getSingleClickData(state);
 
 			totalCoins = state.totalCoins + numCoinsToAdd;
 
-			newState = {...state, totalCoins, lifetimeCoins: state.lifetimeCoins + numCoinsToAdd};
+			Object.keys(partsCounts).forEach(type => {
+				partsCounts[type] += state.partsCounts[type] || 0;
+			});
+
+			newState = {...state, totalCoins, lifetimeCoins: state.lifetimeCoins + numCoinsToAdd, partsCounts};
 			saveState(newState);
 			return newState;
 		case actionTypes.autoAddCoins:
@@ -85,7 +95,11 @@ const gameReducer = (state, action) => {
 		case actionTypes.buyUpgrade:
 			if (action.payload.type === types.factory) {
 				const nextLevel = factoryUpgrades[state.factoryLevel + 1];
-				newState = {...state, factoryLevel: state.factoryLevel + 1, totalCoins: state.totalCoins - nextLevel.cost};
+				newState = {
+					...state,
+					factoryLevel: state.factoryLevel + 1,
+					totalCoins: state.totalCoins - nextLevel.cost
+				};
 			}
 			else {
 				// if you've already bought it, ignore this
@@ -145,11 +159,34 @@ function GameWrapper ({children}) {
 		return [];
 	};
 
+	const getStats = () => {
+		const statsThatMatter = [
+			{
+				name: 'Lifetime coins',
+				coins: state.lifetimeCoins
+			},
+			{
+				name: 'Total clicks',
+				count: state.totalClicks
+			}
+		];
+		Object.entries(state.partsCounts).forEach(([type, count]) => {
+			if (isPartTypeUnlocked(state.upgrades, type)) {
+				statsThatMatter.push({
+					name: getBaseName(type) + ' sold',
+					count
+				});
+			}
+		});
+		return statsThatMatter;
+	};
+
 
 	return (
 		<GameContext.Provider value={
 			{
 				...state,
+				stats: getStats(),
 				recordClick: () => dispatch({type: actionTypes.recordClick}),
 				addCoins: () => dispatch({type: actionTypes.addCoins}),
 				buyUpgrade: (type, id) => dispatch({type: actionTypes.buyUpgrade, payload: {type, id}}),

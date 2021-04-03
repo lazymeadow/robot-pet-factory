@@ -4,6 +4,11 @@ export const types = {
 	factory: 'FACTORY'
 };
 
+export const partTypes = {
+	part1: types.part1,
+	part2: types.part2
+};
+
 const typeNames = {
 	[types.part1]: {
 		singular: 'wire',
@@ -22,7 +27,7 @@ export const getQuantityDesc = (type, quantity, level) => {
 	if (level === 3) {
 		return `You make so many ${typeNames[type].plural}, ${quantity * Math.pow(2, level)} per click.`;
 	}
-	return `Every click makes ${quantity * Math.pow(2, level)} ${quantity > 1 ? typeNames[type].singular : typeNames[type].plural}.`;
+	return `Every click makes ${quantity * Math.pow(2, level)} ${level > 0 ? typeNames[type].plural : typeNames[type].singular}.`;
 };
 export const getQualityDesc = (type, multiplier, price, level) => {
 	if (level === 1) {
@@ -75,6 +80,7 @@ export const factoryUpgrades = [
 		name: 'Factory Level 1',
 		description: 'Your factory is 5% more effective.',
 		upgradeDependencies: [
+			'f_0',
 			'w_quant_0',
 			'w_qual_0'
 		]
@@ -87,6 +93,7 @@ export const factoryUpgrades = [
 		name: 'Factory Level 2',
 		description: 'Your factory is 10% more effective.',
 		upgradeDependencies: [
+			'f_1',
 			's_quant_0',
 			's_qual_0'
 		]
@@ -162,7 +169,8 @@ export const factoryPartUpgrades = {
 			multiplier: 3,
 			upgradeDependencies: [
 				'w_quant_1',
-				'w_qual_1'
+				'w_qual_1',
+				'f_1'
 			]
 		},
 		quantity: [

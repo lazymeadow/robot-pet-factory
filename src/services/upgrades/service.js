@@ -78,7 +78,7 @@ export const getPartUpgradeForDisplayById = (id) => {
 	}
 }
 
-export const getSingleClickIncrement = (gameState) => {
+export const getSingleClickData = (gameState) => {
 	const mathsMap = {};  // each type will be under its key. accumulate, then do the math individually to get a total
 	gameState.upgrades.forEach(upgradeId => {
 		const {type, level, incrementer, multiplier} = findUpgradeById(upgradeId);
@@ -98,17 +98,22 @@ export const getSingleClickIncrement = (gameState) => {
 		}
 	});
 
-	return Math.ceil(factoryUpgrades[gameState.factoryLevel].multiplier * Object.entries(mathsMap)
+	const partsCounts = {};
+
+	const numCoinsToAdd = Math.ceil(factoryUpgrades[gameState.factoryLevel].multiplier * Object.entries(mathsMap)
 		.reduce(
-			(runningTotal, [, {incrementer, incLevel, multiplier, multLevel}]) => {
+			(runningTotal, [type, {incrementer, incLevel, multiplier, multLevel}]) => {
 				// quant/increment => incrementer * 2 ^ incLevel
 				const incTotal = incrementer * Math.pow(2, incLevel);
+				partsCounts[type] = incTotal;
 				// qual/multiply => 1 @ level 0, or multiplier ^ (multLevel + 1)
 				const multTotal = multLevel > 0 ? Math.pow(multiplier, multLevel + 1) : 1;
 				return runningTotal + incTotal * multTotal;
 			},
 			0
 		));
+
+	return {numCoinsToAdd, partsCounts};
 };
 
 const isUpgradeAcquired = (acquiredUpgrades, upgradeToFind) => {
@@ -131,6 +136,11 @@ const isUpgradeAvailable = (acquiredUpgrades, upgradeToCheck) => {
 	}
 };
 
+export const isPartTypeUnlocked = (acquiredUpgrades, type) => {
+	return isUpgradeAcquired(acquiredUpgrades, factoryPartUpgrades[type].unlock);
+};
+
+
 export const getAvailableUpgradesForDisplay = (gameState) => {
 	// get the acquired upgrades off the game state. this will include worker unlocks
 	const acquiredUpgrades = gameState.upgrades;
@@ -150,13 +160,16 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 	}
 
 	// 2. go through factory part upgrades
+	// add the factory level upgrades into the acquired upgrades list for checking
+	const acquiredFactoryUpgrades = factoryUpgrades.slice(0, gameState.factoryLevel + 1).map(upgrade => upgrade.id);
+	const allAcquiredUpgrades = [...acquiredUpgrades, ...acquiredFactoryUpgrades];
 	// for each key in the upgrades map (a part)
 	for (const [partType, {unlock, quantity, quality}] of Object.entries(factoryPartUpgrades)) {
 		let upgradesToAdd = [];
 		// check if unlock is acquired
-		if (isUpgradeAcquired(acquiredUpgrades, unlock)) {
+		if (isUpgradeAcquired(allAcquiredUpgrades, unlock)) {
 			// if acquired, check quantity & quality upgrades for visibility
-			upgradesToAdd = upgradesToAdd.concat(quantity.filter(upgrade => isUpgradeAvailable(acquiredUpgrades, upgrade)).map(upgrade => {
+			upgradesToAdd = upgradesToAdd.concat(quantity.filter(upgrade => isUpgradeAvailable(allAcquiredUpgrades, upgrade)).map(upgrade => {
 				return {
 					id: upgrade.id,
 					cost: upgrade.cost,
@@ -164,7 +177,7 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 					description: getQuantityDesc(partType, unlock.incrementer, upgrade.level)
 				};
 			}));
-			upgradesToAdd = upgradesToAdd.concat(quality.filter(upgrade => isUpgradeAvailable(acquiredUpgrades, upgrade)).map(upgrade => {
+			upgradesToAdd = upgradesToAdd.concat(quality.filter(upgrade => isUpgradeAvailable(allAcquiredUpgrades, upgrade)).map(upgrade => {
 				return {
 					id: upgrade.id,
 					cost: upgrade.cost,
@@ -175,7 +188,7 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 		}
 		else {
 			// if not acquired, check if available
-			if (isUpgradeAvailable(acquiredUpgrades, unlock)) {
+			if (isUpgradeAvailable(allAcquiredUpgrades, unlock)) {
 				// if available, add to map
 				upgradesToAdd.push({
 					id: unlock.id,

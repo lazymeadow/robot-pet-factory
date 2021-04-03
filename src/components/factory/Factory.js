@@ -94,7 +94,7 @@ export default function Factory () {
 
 	const renderTabs = () => (
 		<GameContext.Consumer>
-			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, lifetimeCoins, totalClicks, totalCoins}) => {
+			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, stats, totalCoins}) => {
 				const availableUpgrades = getAvailableUpgrades('factory');
 				const availableWorkers = getAvailableWorkers('factory');
 				return (
@@ -112,8 +112,7 @@ export default function Factory () {
 							</TabContent>
 							<TabContent tabKey={'stats'}>
 								<ul>
-									<li>Click Count: {totalClicks}</li>
-									<li>Total Coins Earned: {lifetimeCoins} C</li>
+									{stats.map(stat => <li>{stat.name}: {!!stat.coins ? `${stat.coins} C` : stat.count}</li>)}
 								</ul>
 							</TabContent>
 							<TabContent tabKey={'achievements'}>Achivements go here</TabContent>
