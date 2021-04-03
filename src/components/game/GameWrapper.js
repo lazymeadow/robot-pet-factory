@@ -21,6 +21,7 @@ const actionTypes = {
 const saveState = (state) => {
 	const stateToSave = {
 		...state,
+		version: process.env.REACT_APP_VERSION
 		// workers: Object.fromEntries(state.workers.map(worker => [worker.id, worker.count]))
 	};
 
@@ -29,7 +30,14 @@ const saveState = (state) => {
 
 const loadState = () => {
 	const loadedState = JSON.parse(localStorage.getItem('gameState'));
-	if (loadedState !== null) {
+	let shouldClearState = false;
+	debugger;
+	if (loadedState !== null && (!loadedState.hasOwnProperty('version') || loadedState.version < process.env.REACT_APP_VERSION)) {
+		alert('Your game version is out of date, and this game is in active development. I\'m forcing you to start from scratch.');
+		shouldClearState = true;
+	}
+
+	if (!shouldClearState && loadedState !== null) {
 		// loadedState.workers = loadWorkers('factory', loadedState.workers || []);
 		return loadedState;
 	}
