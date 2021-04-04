@@ -71,7 +71,8 @@ export const factoryUpgrades = [
 		type: types.factory,
 		cost: 0,
 		multiplier: 1,
-		name: 'Basic Factory'
+		name: 'Basic Factory',
+		workerMax: 0
 	},
 	{
 		id: 'f_1',
@@ -79,12 +80,13 @@ export const factoryUpgrades = [
 		cost: 100,
 		multiplier: 1.05,
 		name: 'Factory Level 1',
-		description: 'Your factory is 5% more effective.',
+		description: 'Your factory is 5% more effective, plus you can have workers now!',
 		upgradeDependencies: [
 			'f_0',
 			'w_quant_0',
 			'w_qual_0'
-		]
+		],
+		workerMax: 10
 	},
 	{
 		id: 'f_2',
@@ -92,12 +94,13 @@ export const factoryUpgrades = [
 		cost: 500,
 		multiplier: 1.10,
 		name: 'Factory Level 2',
-		description: 'Your factory is 10% more effective.',
+		description: 'Your factory is 10% more effective, and you can have more workers.',
 		upgradeDependencies: [
 			'f_1',
 			's_quant_0',
 			's_qual_0'
-		]
+		],
+		workerMax: 25
 	}
 ];
 

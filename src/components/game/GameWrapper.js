@@ -97,7 +97,6 @@ const gameReducer = (state, action) => {
 				const {numCoinsToAdd, itemCountsForStats} = getWorkerIncrementData(state, worker);
 				totalCoinsToAdd += numCoinsToAdd;
 				Object.assign(totalItemCountsForStats, itemCountsForStats);
-				console.log(totalItemCountsForStats);
 			});
 
 			Object.keys(totalItemCountsForStats).forEach(type => {
@@ -139,8 +138,13 @@ const gameReducer = (state, action) => {
 			return newState;
 		case actionTypes.buyWorker:
 			const updatedWorkers = {...state.workers};
-
+			const currentFactoryLevel = factoryUpgrades[state.factoryLevel];
 			const workerToBuy = findWorkerByType(action.payload.type);
+
+			// if you've hit your max for this type, don't add one.
+			if (currentFactoryLevel.workerMax <= updatedWorkers[action.payload.type]) {
+				return state;
+			}
 
 			// update the worker counts
 			if (updatedWorkers.hasOwnProperty(action.payload.type)) {
@@ -248,7 +252,6 @@ function GameWrapper ({children}) {
 	};
 
 	if (state.loading) {
-		console.log('loading...')
 		dispatch({type: actionTypes.init});
 		updateIntervals(state, handleAutoIncrement(dispatch));
 	}
@@ -269,7 +272,8 @@ function GameWrapper ({children}) {
 				getAcquiredUpgrades: () => formatUpgradesForDisplay(state),
 				getAvailableWorkers: () => getAvailableWorkersForDisplay(state),
 				canSeeWorkers: state.factoryLevel > 0,
-				resetGame: () => dispatch({type: actionTypes.clearGameState})
+				resetGame: () => dispatch({type: actionTypes.clearGameState}),
+				currentMaxWorkers: factoryUpgrades[state.factoryLevel].workerMax
 			}}
 		>
 			{children}

@@ -21,11 +21,6 @@ export const getAvailableWorkersForDisplay = (gameState) => {
 	const workersToReturn = [];
 	for (const [workerType, {id, cost, workerDependencies}] of Object.entries(factoryWorkers)) {
 		let shouldAddWorker = workerDependencies.reduce((acc, currDep) => acc && isUpgradeAcquired(allAcquiredUpgrades, {id: currDep}), true);
-		// let shouldAddWorker = true;
-		// for (const dependencyId of workerDependencies) {
-		// 	// if any upgrade is false, we should not add it.
-		// 	shouldAddWorker = shouldAddWorker && isUpgradeAcquired(allAcquiredUpgrades, {id: dependencyId});
-		// }
 		if (shouldAddWorker) {
 			const workerCount = gameState.workers.hasOwnProperty(workerType) ? gameState.workers[workerType] : 0;
 			workersToReturn.push({

@@ -86,7 +86,6 @@ export const getWorkerIncrementData = (gameState, workerType) => {
 	const multiplier = relevantPartUpgrades.unlock.multiplier;
 	const multLevel = relevantPartUpgrades.quality.filter(upgrade => gameState.upgrades.includes(upgrade.id)).reduce((acc, upgrade) => Math.max(acc, upgrade.level), 0);
 
-	console.log(worker.makes, worker.count, worker.incrementer, worker.count * worker.incrementer)
 	return {
 		// use incrementer to add coins based on current part value times the number of workers
 		numCoinsToAdd: worker.count * worker.incrementer * (multLevel > 0 ? Math.pow(multiplier, multLevel + 1) : 1),

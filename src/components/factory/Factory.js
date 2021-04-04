@@ -56,7 +56,7 @@ export default function Factory () {
 		});
 	};
 
-	const renderAvailableWorkers = (availableWorkers, totalCoins, buyWorker) => {
+	const renderAvailableWorkers = (availableWorkers, totalCoins, buyWorker, currentMaxWorkers) => {
 		if (availableWorkers.length === 0) {
 			return (
 				<div>
@@ -67,9 +67,13 @@ export default function Factory () {
 		return availableWorkers.map(worker => {
 			let extraClass = '';
 			let helperText = '';
-			if (worker.cost > totalCoins) {
+			if (worker.count >= currentMaxWorkers) {
+				extraClass = 'unavailable';
+				helperText = 'Upgrade your factory to buy more of these.';
+			}
+			else if (worker.cost > totalCoins) {
 				extraClass = 'expensive';
-				helperText = 'You can\'t buy this right now.';
+				helperText = 'You don\'t have enough coins.';
 			}
 			else {
 				helperText = 'You can buy this!';
@@ -81,12 +85,17 @@ export default function Factory () {
 					 role={'button'}
 					 onClick={() => buyWorker(worker.type)}
 				>
-					<div className={'upgrade-title'}>
-						<h3>{worker.name} ({worker.count})</h3>
-						<span>COST: {worker.cost} C</span>
+					<div className={'upgrade-image'}>
+						<img src={''} alt={`${worker.id}`} />
 					</div>
-					<p>{worker.description}</p>
-					<small>{helperText}</small>
+					<div>
+						<div className={'upgrade-title'}>
+							<h4>{worker.name} ({worker.count})</h4>
+							<span>COST: {worker.cost} C</span>
+						</div>
+						<p>{worker.description}</p>
+						<small>{helperText}</small>
+					</div>
 				</div>
 			);
 		});
@@ -94,7 +103,7 @@ export default function Factory () {
 
 	const renderTabs = () => (
 		<GameContext.Consumer>
-			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, stats, totalCoins}) => {
+			{({buyUpgrade, buyWorker, canSeeWorkers, getAvailableUpgrades, getAvailableWorkers, stats, totalCoins, currentMaxWorkers}) => {
 				const availableUpgrades = getAvailableUpgrades('factory');
 				const availableWorkers = getAvailableWorkers('factory');
 				return (
@@ -117,7 +126,7 @@ export default function Factory () {
 							</TabContent>
 							<TabContent tabKey={'achievements'}>Achivements go here</TabContent>
 							<TabContent tabKey={'workers'}>
-								{renderAvailableWorkers(availableWorkers, totalCoins, buyWorker)}
+								{renderAvailableWorkers(availableWorkers, totalCoins, buyWorker, currentMaxWorkers)}
 							</TabContent>
 						</Tabs>
 					</>
