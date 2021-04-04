@@ -1,5 +1,5 @@
 import {factoryWorkers, getWorkerDesc, getWorkerName} from './data';
-import {getAcquiredFactoryLevelUpgradeIds, getAllAcquiredUpgrades, isUpgradeAcquired} from '../upgrades/service';
+import {getAllAcquiredUpgrades, isUpgradeAcquired} from '../upgrades/service';
 
 
 export const findWorkerByType = (type) => {
@@ -11,9 +11,7 @@ export const isWorkerTypeUnlocked = (acquiredUpgrades, type) => {
 	if (!worker) {
 		return false;
 	}
-	return worker.workerDependencies.reduce((acc, currDep) => acc && isUpgradeAcquired(acquiredUpgrades, type))
-	const workerAcquired = worker.workerDependencies.reduce((acc, currDep) => acc && isUpgradeAcquired(acquiredUpgrades, {id: currDep}), true);
-	return workerAcquired;
+	return worker.workerDependencies.reduce((acc, currDep) => acc && isUpgradeAcquired(acquiredUpgrades, {id: currDep}), true);
 }
 
 export const getAvailableWorkersForDisplay = (gameState) => {
@@ -29,10 +27,11 @@ export const getAvailableWorkersForDisplay = (gameState) => {
 		// 	shouldAddWorker = shouldAddWorker && isUpgradeAcquired(allAcquiredUpgrades, {id: dependencyId});
 		// }
 		if (shouldAddWorker) {
+			const workerCount = gameState.workers.hasOwnProperty(workerType) ? gameState.workers[workerType] : 0;
 			workersToReturn.push({
 				id,
-				cost,
-				count: gameState.workers.hasOwnProperty(workerType) ? gameState.workers[workerType] : 0,
+				cost: Math.ceil(cost * Math.pow(2, workerCount)),
+				count: workerCount,
 				name: getWorkerName(workerType),
 				description: getWorkerDesc(workerType),
 				type: workerType

@@ -1,11 +1,11 @@
 import {createContext, useReducer} from 'react';
-import {getWorkerById, loadWorkers, unlockableWorkers, updateIntervals} from './workers';
 import {
 	findUpgradeById,
-	formatUpgradesForDisplay, getAllAcquiredUpgrades,
+	formatUpgradesForDisplay,
+	getAllAcquiredUpgrades,
 	getAvailableUpgradesForDisplay,
 	getFactoryDefault,
-	getSingleClickData,
+	getSingleClickData, getWorkerIncrementData,
 	isPartTypeUnlocked
 } from '../../services/upgrades/service';
 import {factoryUpgrades, getBaseName, partTypes, types} from '../../services/upgrades/data';
@@ -16,15 +16,16 @@ import {getWorkerName} from '../../services/workers/data';
 const GameContext = createContext();
 
 const actionTypes = {
+	init: 'INIT',
 	clearGameState: 'CLEAR_GAME_STATE',
 	addCoins: 'ADD_COINS',
-	autoAddCoins: 'AUTO_ADD_COINS',
+	autoAddCoinsForWorkers: 'AUTO_ADD_COINS',
 	recordClick: 'RECORD_CLICK',
 	buyUpgrade: 'BUY_UPGRADE',
 	buyWorker: 'BUY_WORKER'
 };
 
-const saveState = (state) => {
+const saveState = ({loading: _, ...state}) => {
 	const stateToSave = {
 		...state,
 		version: process.env.REACT_APP_VERSION
@@ -35,10 +36,12 @@ const saveState = (state) => {
 };
 
 const defaultGameState = () => ({
+	loading: true,
 	factoryLevel: 0,
 	totalClicks: 0,
-	totalCoins: 99,//0,
+	totalCoins: 99,
 	lifetimeCoins: 0,
+	workerLifetimeCoins: 0,
 	itemCountsForStats: Object.fromEntries(Object.values(partTypes).map(type => [type, 0])),
 	workers: {},
 	upgrades: getFactoryDefault()
@@ -63,14 +66,11 @@ const loadState = () => {
 	}
 };
 
-
-const handleAutoIncrement = (dispatch) => (coins) => {
-	dispatch({type: actionTypes.autoAddCoins, payload: {coins}});
-};
-
 const gameReducer = (state, action) => {
 	let newState, totalCoins;
 	switch (action.type) {
+		case actionTypes.init:
+			return {...state, loading: false};
 		case actionTypes.recordClick:
 			let totalClicks = state.totalClicks + 1;
 			newState = {...state, totalClicks};
@@ -88,10 +88,30 @@ const gameReducer = (state, action) => {
 			newState = {...state, totalCoins, lifetimeCoins: state.lifetimeCoins + numCoinsToAdd, itemCountsForStats};
 			saveState(newState);
 			return newState;
-		case actionTypes.autoAddCoins:
-			const addedCoins = action.payload.coins;
-			totalCoins = state.totalCoins + addedCoins;
-			newState = {...state, totalCoins, lifetimeCoins: state.lifetimeCoins + addedCoins};
+		case actionTypes.autoAddCoinsForWorkers:
+			let totalCoinsToAdd = 0;
+			const totalItemCountsForStats = {};
+
+			// iterate over the workers who are updating
+			action.payload.workers.forEach(worker => {
+				const {numCoinsToAdd, itemCountsForStats} = getWorkerIncrementData(state, worker);
+				totalCoinsToAdd += numCoinsToAdd;
+				Object.assign(totalItemCountsForStats, itemCountsForStats);
+				console.log(totalItemCountsForStats);
+			});
+
+			Object.keys(totalItemCountsForStats).forEach(type => {
+				totalItemCountsForStats[type] += state.itemCountsForStats[type] || 0;
+			});
+
+			newState = {
+				...state,
+				totalCoins: state.totalCoins + totalCoinsToAdd,
+				// tally coins earned by this worker type for stats
+				workerLifetimeCoins: state.workerLifetimeCoins + totalCoinsToAdd,
+				itemCountsForStats: {...state.itemCountsForStats, ...totalItemCountsForStats}
+			};
+
 			saveState(newState);
 			return newState;
 		case actionTypes.buyUpgrade:
@@ -151,10 +171,43 @@ const gameReducer = (state, action) => {
 	}
 };
 
+
+const handleAutoIncrement = (dispatch) => (workersWhoDelivered) => {
+	dispatch({type: actionTypes.autoAddCoinsForWorkers, payload: {workers: workersWhoDelivered}});
+};
+
+
+const intervalIds = [];
+const updateIntervals = (gameState, incrementHandler) => {
+	// first clean up all the existing intervals
+	intervalIds.forEach(intervalId => window.clearInterval(intervalId));
+	intervalIds.splice(0);
+	// then go make new intervals for the items that already exist.
+	// map the intervals by duration
+	const intervalMap = {};
+	Object.entries(gameState.workers).forEach(([workerType, count]) => {
+		const worker = findWorkerByType(workerType);
+
+		if (!intervalMap.hasOwnProperty(worker.interval)) {
+			intervalMap[worker.interval] = [];
+		}
+		intervalMap[worker.interval].push(workerType);
+	});
+	for (const [interval, workers] of Object.entries(intervalMap)) {
+		if (!!interval) {
+			intervalIds.push(
+				window.setInterval(() => {
+						incrementHandler(workers);
+					},
+					interval * 1000
+				)
+			);
+		}
+	}
+};
+
 function GameWrapper ({children}) {
 	const [state, dispatch] = useReducer(gameReducer, {}, loadState);
-
-	// updateIntervals(state, handleAutoIncrement(dispatch));
 
 	const getStats = () => {
 		const statsThatMatter = [
@@ -169,6 +222,14 @@ function GameWrapper ({children}) {
 		];
 		const acquiredUpgrades = getAllAcquiredUpgrades(state);
 
+		// can see workers fl 1+
+		if (state.factoryLevel > 0) {
+			statsThatMatter.push({
+				name: 'Total coins earned by workers',
+				coins: state.workerLifetimeCoins
+			});
+		}
+
 		Object.entries(state.itemCountsForStats).forEach(([type, count]) => {
 			if (isPartTypeUnlocked(acquiredUpgrades, type)) {
 				statsThatMatter.push({
@@ -180,12 +241,17 @@ function GameWrapper ({children}) {
 				statsThatMatter.push({
 					name: getWorkerName(type),
 					count
-				})
+				});
 			}
 		});
 		return statsThatMatter;
 	};
 
+	if (state.loading) {
+		console.log('loading...')
+		dispatch({type: actionTypes.init});
+		updateIntervals(state, handleAutoIncrement(dispatch));
+	}
 
 	return (
 		<GameContext.Provider value={
@@ -197,7 +263,7 @@ function GameWrapper ({children}) {
 				buyUpgrade: (type, id) => dispatch({type: actionTypes.buyUpgrade, payload: {type, id}}),
 				buyWorker: (type, id) => {
 					dispatch({type: actionTypes.buyWorker, payload: {type, id}});
-					// updateIntervals(state, handleAutoIncrement(dispatch));
+					updateIntervals(state, handleAutoIncrement(dispatch));
 				},
 				getAvailableUpgrades: () => getAvailableUpgradesForDisplay(state),
 				getAcquiredUpgrades: () => formatUpgradesForDisplay(state),

@@ -8,6 +8,7 @@ import {
 	getQuantityDesc,
 	getQuantityName
 } from './data';
+import {findWorkerByType} from '../workers/service';
 
 
 export const findUpgradeById = (id) => {
@@ -77,6 +78,24 @@ export const getPartUpgradeForDisplayById = (id) => {
 		}
 	}
 }
+
+export const getWorkerIncrementData = (gameState, workerType) => {
+	const worker = {...findWorkerByType(workerType), count: gameState.workers[workerType]};
+	// get multiplier for this worker's output part
+	const relevantPartUpgrades = factoryPartUpgrades[worker.makes];
+	const multiplier = relevantPartUpgrades.unlock.multiplier;
+	const multLevel = relevantPartUpgrades.quality.filter(upgrade => gameState.upgrades.includes(upgrade.id)).reduce((acc, upgrade) => Math.max(acc, upgrade.level), 0);
+
+	console.log(worker.makes, worker.count, worker.incrementer, worker.count * worker.incrementer)
+	return {
+		// use incrementer to add coins based on current part value times the number of workers
+		numCoinsToAdd: worker.count * worker.incrementer * (multLevel > 0 ? Math.pow(multiplier, multLevel + 1) : 1),
+		// tally parts made by this worker type for stats
+		itemCountsForStats: {
+			[worker.makes]: worker.count * worker.incrementer
+		}
+	};
+};
 
 export const getSingleClickData = (gameState) => {
 	const mathsMap = {};  // each type will be under its key. accumulate, then do the math individually to get a total
