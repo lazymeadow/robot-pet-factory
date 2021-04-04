@@ -98,14 +98,14 @@ export const getSingleClickData = (gameState) => {
 		}
 	});
 
-	const partsCounts = {};
+	const itemCountsForStats = {};
 
 	const numCoinsToAdd = Math.ceil(factoryUpgrades[gameState.factoryLevel].multiplier * Object.entries(mathsMap)
 		.reduce(
 			(runningTotal, [type, {incrementer, incLevel, multiplier, multLevel}]) => {
 				// quant/increment => incrementer * 2 ^ incLevel
 				const incTotal = incrementer * Math.pow(2, incLevel);
-				partsCounts[type] = incTotal;
+				itemCountsForStats[type] = incTotal;
 				// qual/multiply => 1 @ level 0, or multiplier ^ (multLevel + 1)
 				const multTotal = multLevel > 0 ? Math.pow(multiplier, multLevel + 1) : 1;
 				return runningTotal + incTotal * multTotal;
@@ -113,10 +113,10 @@ export const getSingleClickData = (gameState) => {
 			0
 		));
 
-	return {numCoinsToAdd, partsCounts};
+	return {numCoinsToAdd, itemCountsForStats};
 };
 
-const isUpgradeAcquired = (acquiredUpgrades, upgradeToFind) => {
+export const isUpgradeAcquired = (acquiredUpgrades, upgradeToFind) => {
 	// acquired upgrades will be a list of ids from gameState
 	return acquiredUpgrades.findIndex(upgradeId => upgradeId === upgradeToFind.id) >= 0;
 };
@@ -137,21 +137,30 @@ const isUpgradeAvailable = (acquiredUpgrades, upgradeToCheck) => {
 };
 
 export const isPartTypeUnlocked = (acquiredUpgrades, type) => {
+	if (!factoryPartUpgrades.hasOwnProperty(type)) {
+		return false;
+	}
 	return isUpgradeAcquired(acquiredUpgrades, factoryPartUpgrades[type].unlock);
 };
 
+export const getAcquiredFactoryLevelUpgradeIds = (factoryLevel) => {
+	return factoryUpgrades.slice(0, factoryLevel + 1).map(upgrade => upgrade.id);
+}
+
+export const getAllAcquiredUpgrades = (gameState) => {
+	return [...gameState.upgrades, ...getAcquiredFactoryLevelUpgradeIds(gameState.factoryLevel)];
+}
 
 export const getAvailableUpgradesForDisplay = (gameState) => {
-	// get the acquired upgrades off the game state. this will include worker unlocks
-	const acquiredUpgrades = gameState.upgrades;
-	// TODO: make for kennel too
+	// add the factory level upgrades to the acquired upgrades list for checking
+	const allAcquiredUpgrades = getAllAcquiredUpgrades(gameState);
 
 	// make an array -> [{categoryName: '', upgrades: [...]}, ...]
 	const upgradesToReturn = [];
 	// 1. get the next factory level
 	if ((gameState.factoryLevel + 1) < factoryUpgrades.length) {
 		const nextFactoryLevel = factoryUpgrades[gameState.factoryLevel + 1];
-		if (isUpgradeAvailable(acquiredUpgrades, nextFactoryLevel)) {
+		if (isUpgradeAvailable(allAcquiredUpgrades, nextFactoryLevel)) {
 			upgradesToReturn.push({
 				categoryName: 'Factory Level',
 				upgrades: [factoryUpgrades[gameState.factoryLevel + 1]]
@@ -160,9 +169,6 @@ export const getAvailableUpgradesForDisplay = (gameState) => {
 	}
 
 	// 2. go through factory part upgrades
-	// add the factory level upgrades into the acquired upgrades list for checking
-	const acquiredFactoryUpgrades = factoryUpgrades.slice(0, gameState.factoryLevel + 1).map(upgrade => upgrade.id);
-	const allAcquiredUpgrades = [...acquiredUpgrades, ...acquiredFactoryUpgrades];
 	// for each key in the upgrades map (a part)
 	for (const [partType, {unlock, quantity, quality}] of Object.entries(factoryPartUpgrades)) {
 		let upgradesToAdd = [];

@@ -79,7 +79,7 @@ export default function Factory () {
 				<div key={worker.id}
 					 className={`upgrade ${extraClass}`}
 					 role={'button'}
-					 onClick={() => buyWorker(worker.type, worker.id)}
+					 onClick={() => buyWorker(worker.type)}
 				>
 					<div className={'upgrade-title'}>
 						<h3>{worker.name} ({worker.count})</h3>
@@ -112,7 +112,7 @@ export default function Factory () {
 							</TabContent>
 							<TabContent tabKey={'stats'}>
 								<ul>
-									{stats.map(stat => <li>{stat.name}: {!!stat.coins ? `${stat.coins} C` : stat.count}</li>)}
+									{stats.map(stat => <li>{stat.name}: {stat.coins >= 0 ? `${stat.coins} C` : stat.count}</li>)}
 								</ul>
 							</TabContent>
 							<TabContent tabKey={'achievements'}>Achivements go here</TabContent>

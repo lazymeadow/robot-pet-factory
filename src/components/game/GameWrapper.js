@@ -2,13 +2,15 @@ import {createContext, useReducer} from 'react';
 import {getWorkerById, loadWorkers, unlockableWorkers, updateIntervals} from './workers';
 import {
 	findUpgradeById,
-	formatUpgradesForDisplay,
+	formatUpgradesForDisplay, getAllAcquiredUpgrades,
 	getAvailableUpgradesForDisplay,
 	getFactoryDefault,
 	getSingleClickData,
 	isPartTypeUnlocked
 } from '../../services/upgrades/service';
 import {factoryUpgrades, getBaseName, partTypes, types} from '../../services/upgrades/data';
+import {findWorkerByType, getAvailableWorkersForDisplay, isWorkerTypeUnlocked} from '../../services/workers/service';
+import {getWorkerName} from '../../services/workers/data';
 
 
 const GameContext = createContext();
@@ -37,8 +39,8 @@ const defaultGameState = () => ({
 	totalClicks: 0,
 	totalCoins: 99,//0,
 	lifetimeCoins: 0,
-	partsCounts: Object.fromEntries(Object.values(partTypes).map(type => [type, 0])),
-	workers: [],
+	itemCountsForStats: Object.fromEntries(Object.values(partTypes).map(type => [type, 0])),
+	workers: {},
 	upgrades: getFactoryDefault()
 });
 
@@ -75,15 +77,15 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.addCoins:
-			const {numCoinsToAdd, partsCounts} = getSingleClickData(state);
+			const {numCoinsToAdd, itemCountsForStats} = getSingleClickData(state);
 
 			totalCoins = state.totalCoins + numCoinsToAdd;
 
-			Object.keys(partsCounts).forEach(type => {
-				partsCounts[type] += state.partsCounts[type] || 0;
+			Object.keys(itemCountsForStats).forEach(type => {
+				itemCountsForStats[type] += state.itemCountsForStats[type] || 0;
 			});
 
-			newState = {...state, totalCoins, lifetimeCoins: state.lifetimeCoins + numCoinsToAdd, partsCounts};
+			newState = {...state, totalCoins, lifetimeCoins: state.lifetimeCoins + numCoinsToAdd, itemCountsForStats};
 			saveState(newState);
 			return newState;
 		case actionTypes.autoAddCoins:
@@ -116,28 +118,29 @@ const gameReducer = (state, action) => {
 			saveState(newState);
 			return newState;
 		case actionTypes.buyWorker:
-			const foundWorker = state.workers.find(worker => worker.id === action.payload.id);
-			if (foundWorker) {
-				if (foundWorker.cost > state.totalCoins) {
-					return state;
-				}
-				foundWorker.addWorker();
-				// saveState(newState);
-				newState = {...state, totalCoins: state.totalCoins - foundWorker.cost};
+			const updatedWorkers = {...state.workers};
+
+			const workerToBuy = findWorkerByType(action.payload.type);
+
+			// update the worker counts
+			if (updatedWorkers.hasOwnProperty(action.payload.type)) {
+				updatedWorkers[action.payload.type]++;
 			}
 			else {
-				const workerToAdd = getWorkerById(action.payload.type, action.payload.id);
-				if (workerToAdd.cost > state.totalCoins) {
-					return state;
-				}
-				workerToAdd.addWorker();
-				newState = {
-					...state,
-					workers: [...state.workers, workerToAdd],
-					totalCoins: state.totalCoins - workerToAdd.cost
-				};
-				saveState(newState);
+				updatedWorkers[action.payload.type] = 1;
 			}
+
+			newState = {
+				...state,
+				workers: updatedWorkers,
+				totalCoins: state.totalCoins - workerToBuy.cost,
+				itemCountsForStats: {
+					...state.itemCountsForStats,
+					[action.payload.type]: state.itemCountsForStats.hasOwnProperty(action.payload.type) ? state.itemCountsForStats[action.payload.type] + 1 : 1
+				}
+			};
+
+			saveState(newState);
 			return newState;
 		case actionTypes.clearGameState:
 			newState = defaultGameState();
@@ -153,12 +156,6 @@ function GameWrapper ({children}) {
 
 	// updateIntervals(state, handleAutoIncrement(dispatch));
 
-	const getAvailableWorkers = (type) => {
-		// const workerList = [...unlockableWorkers[type]];
-		// return workerList.filter(worker => worker.isVisible(state));
-		return [];
-	};
-
 	const getStats = () => {
 		const statsThatMatter = [
 			{
@@ -170,12 +167,20 @@ function GameWrapper ({children}) {
 				count: state.totalClicks
 			}
 		];
-		Object.entries(state.partsCounts).forEach(([type, count]) => {
-			if (isPartTypeUnlocked(state.upgrades, type)) {
+		const acquiredUpgrades = getAllAcquiredUpgrades(state);
+
+		Object.entries(state.itemCountsForStats).forEach(([type, count]) => {
+			if (isPartTypeUnlocked(acquiredUpgrades, type)) {
 				statsThatMatter.push({
 					name: getBaseName(type) + ' sold',
 					count
 				});
+			}
+			else if (isWorkerTypeUnlocked(acquiredUpgrades, type)) {
+				statsThatMatter.push({
+					name: getWorkerName(type),
+					count
+				})
 			}
 		});
 		return statsThatMatter;
@@ -196,7 +201,7 @@ function GameWrapper ({children}) {
 				},
 				getAvailableUpgrades: () => getAvailableUpgradesForDisplay(state),
 				getAcquiredUpgrades: () => formatUpgradesForDisplay(state),
-				getAvailableWorkers,
+				getAvailableWorkers: () => getAvailableWorkersForDisplay(state),
 				canSeeWorkers: state.factoryLevel > 0,
 				resetGame: () => dispatch({type: actionTypes.clearGameState})
 			}}
