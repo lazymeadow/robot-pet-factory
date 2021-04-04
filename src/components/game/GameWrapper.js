@@ -29,7 +29,6 @@ const saveState = ({loading: _, ...state}) => {
 	const stateToSave = {
 		...state,
 		version: process.env.REACT_APP_VERSION
-		// workers: Object.fromEntries(state.workers.map(worker => [worker.id, worker.count]))
 	};
 
 	localStorage.setItem('gameState', JSON.stringify(stateToSave));
@@ -39,7 +38,7 @@ const defaultGameState = () => ({
 	loading: true,
 	factoryLevel: 0,
 	totalClicks: 0,
-	totalCoins: 99,
+	totalCoins: 0,
 	lifetimeCoins: 0,
 	workerLifetimeCoins: 0,
 	itemCountsForStats: Object.fromEntries(Object.values(partTypes).map(type => [type, 0])),
